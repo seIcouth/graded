@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/screens/auth_screens/register.dart';
+import 'package:graded/screens/homepage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -26,15 +28,19 @@ class _LoginPageState extends State<LoginPage> {
 
     if(datauser.isNotEmpty){
       if(datauser[0]['role']=='student'){
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const Page1(),
+            builder: (context) => const HomePage(),
           ),
         );
       } else if(datauser[0]['role']=='instructor'){
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const Page2(),
+            builder: (context) => const HomePage(),
           ),
         );
       }
@@ -246,23 +252,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-}
-
-class Page1 extends StatelessWidget {
-  const Page1({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text('Hello'),),body: const Center(child: Text('Student'),));
-  }
-}
-
-class Page2 extends StatelessWidget {
-  const Page2({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Instructor'),));
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/screens/auth_screens/login.dart';
+import 'package:graded/screens/homepage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -36,6 +38,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       "role": isStudent ? "student" : "instructor"
       //"role": role.text,
     });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
 
     return response.body;
   }
@@ -277,7 +282,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 await register();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const Page1(),
+                                    builder: (context) => const HomePage(),
                                   ),
                                 );
                               } catch(e){print(e);}
