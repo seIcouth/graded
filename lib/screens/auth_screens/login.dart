@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/screens/auth_screens/register.dart';
-import 'package:graded/screens/homepage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../hidden_drawer.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setBool('isLoggedIn', true);
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const HomePage(),
+            builder: (context) => const HiddenDrawer(),
           ),
         );
       } else if (datauser[0]['role'] == 'instructor') {
@@ -38,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setBool('isLoggedIn', true);
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const HomePage(),
+            builder: (context) => const HiddenDrawer(),
           ),
         );
       }

@@ -39,6 +39,7 @@ dependencies:
   http: ^0.13.5
   flutter_flushbar: ^0.0.2
   shared_preferences: ^2.0.18
+  hidden_drawer_menu: ^3.0.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.12.0

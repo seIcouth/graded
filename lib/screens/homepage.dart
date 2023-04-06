@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graded/screens/auth_screens/login.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,21 +18,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: colorLight,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(
-          'Home',
-          style: TextStyle(
-            color: colorLight,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: colorDark,
-        leading: Icon(
-          Icons.menu_rounded,
-          color: colorLight,
-        ),
-      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
@@ -117,20 +100,6 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-                ),
-                const Spacer(),
-                ElevatedButton(
-                  onPressed: () async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setBool('isLoggedIn', false);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
-                  },
-                  child: const Text('Log out'),
                 ),
               ],
             ),

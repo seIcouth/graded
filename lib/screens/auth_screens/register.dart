@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:graded/hidden_drawer.dart';
 import 'package:graded/screens/auth_screens/login.dart';
-import 'package:graded/screens/homepage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -282,7 +282,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 await register();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) => const HomePage(),
+                                    builder: (context) => const HiddenDrawer(),
                                   ),
                                 );
                               } catch(e){print(e);}
