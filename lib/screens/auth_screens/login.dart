@@ -229,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'New to Graded?',
+                      'New to GRADED?',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
