@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/hidden_drawer.dart';
+import 'package:graded/resources/reusable_methods.dart';
 import 'package:graded/screens/auth_screens/login.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -39,8 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       //"role": role.text,
     });
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
+    ReusableMethods.setLoggedInTrue();
 
     return response.body;
   }
@@ -49,15 +48,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return pass.text.trim() == confirmPass.text.trim();
   }
 
-  bool isValidEmail(String email) {
-    RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegExp.hasMatch(email);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfffff4f0),
+      backgroundColor: ReusableMethods.colorLight,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -70,14 +64,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 250,
                     child: Image.asset('assets/images/logo_straight.png'),
                   ),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Create your GRADED account below',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xff0e1e40),
+                        color: ReusableMethods.colorDark,
                       ),
                     ),
                   ),
@@ -86,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xfff5f5f5),
                       border: Border.all(
-                        color: const Color(0xff0e1e40),
+                        color: ReusableMethods.colorDark,
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
@@ -96,12 +90,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'Register as',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: Color(0xff0e1e40),
+                                color: ReusableMethods.colorDark,
                               ),
                             ),
                             const SizedBox(height: 8,),
@@ -116,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             borderRadius: BorderRadius.circular(12.0),
                                           )
                                       ),
-                                      backgroundColor: (isClicked && isStudent) ? MaterialStateProperty.all(const Color(0xff808080)) : MaterialStateProperty.all(const Color(0xff0e1e40)),
+                                      backgroundColor: (isClicked && isStudent) ? MaterialStateProperty.all(const Color(0xff808080)) : MaterialStateProperty.all(ReusableMethods.colorDark),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -139,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             borderRadius: BorderRadius.circular(12.0),
                                           )
                                       ),
-                                      backgroundColor: (isClicked && !isStudent) ? MaterialStateProperty.all(const Color(0xff808080)) : MaterialStateProperty.all(const Color(0xff0e1e40)),
+                                      backgroundColor: (isClicked && !isStudent) ? MaterialStateProperty.all(const Color(0xff808080)) : MaterialStateProperty.all(ReusableMethods.colorDark),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -162,7 +156,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: const Color(0xff0e1e40),
+                    cursorColor: ReusableMethods.colorDark,
                     controller: mail,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -170,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xff0e1e40)),
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
@@ -178,33 +172,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                     ),
                   ),
-                  /*
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: TextField(
-                      cursorHeight: 16,
-                      cursorWidth: 1.5,
-                      cursorColor: const Color(0xff0e1e40),
-                      controller: role,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Colors.white),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(color: Color(0xff0e1e40)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        hintText: 'Role',
-                        fillColor: Colors.grey[100],
-                        filled: true,
-                      ),
-                    ),
-                  ),
-                   */
                   const SizedBox(
                     height: 10,
                   ),
@@ -212,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: const Color(0xff0e1e40),
+                    cursorColor: ReusableMethods.colorDark,
                     controller: pass,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -220,7 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xff0e1e40)),
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Password',
@@ -235,7 +202,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: const Color(0xff0e1e40),
+                    cursorColor: ReusableMethods.colorDark,
                     controller: confirmPass,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -243,7 +210,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xff0e1e40)),
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Confirm password',
@@ -268,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ).show(context);
                       }
                       else{
-                        if(isValidEmail(mail.text)){
+                        if(ReusableMethods.isValidEmail(mail.text)){
                           if(!passwordConfirmed()) {
                             Flushbar(
                               message: "Given passwords do not match!",
@@ -310,7 +277,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(12.0),
                           )
                       ),
-                      backgroundColor: MaterialStateProperty.all(const Color(0xff0e1e40)),
+                      backgroundColor: MaterialStateProperty.all(ReusableMethods.colorDark),
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(20),

@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/screens/auth_screens/register.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../hidden_drawer.dart';
+import '../../resources/reusable_methods.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -27,16 +26,14 @@ class _LoginPageState extends State<LoginPage> {
 
     if (datauser.isNotEmpty) {
       if (datauser[0]['role'] == 'student') {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
+        ReusableMethods.setLoggedInTrue();
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => const HiddenDrawer(),
           ),
         );
       } else if (datauser[0]['role'] == 'instructor') {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
+        ReusableMethods.setLoggedInTrue();
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => const HiddenDrawer(),
@@ -50,15 +47,10 @@ class _LoginPageState extends State<LoginPage> {
     return datauser;
   }
 
-  bool isValidEmail(String email) {
-    RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegExp.hasMatch(email);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfffff4f0),
+      backgroundColor: ReusableMethods.colorLight,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -71,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 300,
                   child: Image.asset('assets/images/logo_straight.png'),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(left: 30.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -80,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xff0e1e40),
+                        color: ReusableMethods.colorDark,
                       ),
                     ),
                   ),
@@ -93,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: const Color(0xff0e1e40),
+                    cursorColor: ReusableMethods.colorDark,
                     controller: mail,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -101,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xff0e1e40)),
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
@@ -119,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: true,
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: const Color(0xff0e1e40),
+                    cursorColor: ReusableMethods.colorDark,
                     controller: pass,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -127,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xff0e1e40)),
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Password',
@@ -173,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
                                   50),
                         ).show(context);
                       } else {
-                        if (isValidEmail(mail.text)) {
+                        if (ReusableMethods.isValidEmail(mail.text)) {
                           try {
                             await login();
                           } on FormatException catch (e) {
@@ -205,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12.0),
                       )),
                       backgroundColor:
-                          MaterialStateProperty.all(const Color(0xff0e1e40)),
+                          MaterialStateProperty.all(ReusableMethods.colorDark),
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(20),
@@ -228,12 +220,12 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'New to GRADED?',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xff0e1e40),
+                        color: ReusableMethods.colorDark,
                       ),
                     ),
                     GestureDetector(

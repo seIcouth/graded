@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graded/models/home_notification.dart';
+import 'package:graded/resources/reusable_methods.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -53,9 +54,6 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  final Color colorLight = const Color(0xfffff4f0);
-  final Color colorDark = const Color(0xff0e1e40);
-
   @override
   Widget build(BuildContext context) {
     for (int i = 0; i < homeNotifications.length; i++) {
@@ -73,7 +71,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      backgroundColor: colorLight,
+      backgroundColor: ReusableMethods.colorLight,
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: Padding(
@@ -84,9 +82,9 @@ class _HomePageState extends State<HomePage> {
                 Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
-                  color: colorLight,
+                  color: ReusableMethods.colorLight,
                   elevation: 2.0,
-                  shadowColor: colorDark,
+                  shadowColor: ReusableMethods.colorDark,
                   child: Container(
                     width: double.infinity,
                     margin: const EdgeInsets.all(8.0),
@@ -100,12 +98,12 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Icon(
                                   Icons.notifications_none_outlined,
-                                  color: colorDark,
+                                  color: ReusableMethods.colorDark,
                                 ),
                                 Text(
                                   "Recent Notifications",
                                   style: TextStyle(
-                                    color: colorDark,
+                                    color: ReusableMethods.colorDark,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -154,11 +152,11 @@ class _HomePageState extends State<HomePage> {
     return Card(
       color: announcementColor,
       elevation: 6,
-      shadowColor: colorDark,
+      shadowColor: ReusableMethods.colorDark,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: colorLight,
+        color: ReusableMethods.colorLight,
         elevation: 2.0,
         child: Container(
           margin: const EdgeInsets.all(8.0),
@@ -263,11 +261,11 @@ class _HomePageState extends State<HomePage> {
     return Card(
       color: assignmentColor,
       elevation: 6,
-      shadowColor: colorDark,
+      shadowColor: ReusableMethods.colorDark,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: colorLight,
+        color: ReusableMethods.colorLight,
         elevation: 2.0,
         child: Container(
           margin: const EdgeInsets.all(8.0),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../resources/reusable_methods.dart';
 import 'auth_screens/login.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -8,12 +8,11 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ReusableMethods.colorLight,
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            SharedPreferences prefs =
-            await SharedPreferences.getInstance();
-            await prefs.setBool('isLoggedIn', false);
+            ReusableMethods.setLoggedInFalse();
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const LoginPage(),
