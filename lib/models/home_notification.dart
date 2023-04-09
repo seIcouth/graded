@@ -1,17 +1,31 @@
-abstract class HomeNotification {
+abstract class Notification {
   String title;
   String courseCode;
   String courseName;
   String content;
 
-  HomeNotification(
+  Notification(
       {required this.title,
       required this.courseCode,
       required this.courseName,
       required this.content});
 }
 
-class AssignmentNotification extends HomeNotification {
+class AnnouncementNotification extends Notification {
+  AnnouncementNotification({
+    required super.title,
+    required super.courseCode,
+    required super.courseName,
+    required super.content,
+  });
+
+  @override
+  String toString() {
+    return "$title $courseCode $courseName $content";
+  }
+}
+
+class AssignmentNotification extends Notification {
   String dueDate;
 
   AssignmentNotification(
@@ -24,19 +38,5 @@ class AssignmentNotification extends HomeNotification {
   @override
   String toString() {
     return "$title $courseCode $courseName $content $dueDate";
-  }
-}
-
-class AnnouncementNotification extends HomeNotification {
-  AnnouncementNotification({
-    required super.title,
-    required super.courseCode,
-    required super.courseName,
-    required super.content,
-  });
-
-  @override
-  String toString() {
-    return "$title $courseCode $courseName $content";
   }
 }

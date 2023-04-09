@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ReusableMethods{
+class ReusableMethods {
   static Color colorDark = const Color(0xff0e1e40);
   static Color colorLight = const Color(0xfffff4f0);
   static Color colorBlue = const Color(0xff023e8a);
+  static Color colorAnnouncement = const Color(0xff2196f3);
+  static Color colorAssignment = const Color(0xffff6340);
+  static Color colorPeople = const Color(0xff7c4dff);
+  static Color colorGrades = const Color(0xff009688);
 
   static bool isValidEmail(String email) {
     RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -26,5 +30,4 @@ class ReusableMethods{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
   }
-
 }

@@ -13,7 +13,6 @@ class HiddenDrawer extends StatefulWidget {
 }
 
 class _HiddenDrawerState extends State<HiddenDrawer> {
-
   List<ScreenHiddenDrawer> _pages = [];
 
   @override
@@ -23,8 +22,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
     final textStyle = TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 18,
-        color: ReusableMethods.colorLight
-    );
+        color: ReusableMethods.colorDark);
 
     _pages = [
       ScreenHiddenDrawer(
@@ -32,25 +30,23 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Home',
             baseStyle: textStyle,
             selectedStyle: textStyle,
-            colorLineSelected: Colors.white,
+            colorLineSelected: ReusableMethods.colorDark,
           ),
-          const HomePage()
-      ),
+          const HomePage()),
       ScreenHiddenDrawer(
           ItemHiddenMenu(
             name: 'Profile',
             baseStyle: textStyle,
             selectedStyle: textStyle,
-            colorLineSelected: Colors.white,
+            colorLineSelected: ReusableMethods.colorDark,
           ),
-          const ProfilePage()
-      ),
+          const ProfilePage()),
       ScreenHiddenDrawer(
-          ItemHiddenMenu(
+        ItemHiddenMenu(
             name: 'Log out',
             baseStyle: textStyle,
             selectedStyle: textStyle,
-            colorLineSelected: Colors.white,
+            colorLineSelected: ReusableMethods.colorDark,
             onTap: () async {
               ReusableMethods.setLoggedInFalse();
               Navigator.of(context).push(
@@ -58,8 +54,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
                   builder: (context) => const LoginPage(),
                 ),
               );
-            }
-          ),
+            }),
         const Center(child: CircularProgressIndicator()),
       ),
     ];
@@ -68,7 +63,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
   @override
   Widget build(BuildContext context) {
     return HiddenDrawerMenu(
-      backgroundColorMenu: ReusableMethods.colorBlue,
+      backgroundColorMenu: ReusableMethods.colorLight,
       screens: _pages,
       initPositionSelected: 0,
       slidePercent: 60,

@@ -18,14 +18,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          fontFamily: 'San Francisco',
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: ReusableMethods.colorDark,
-          ),
+        fontFamily: 'San Francisco',
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(
+              primary: ReusableMethods.colorDark,
+            )
+            .copyWith(secondary: ReusableMethods.colorDark),
       ),
       debugShowCheckedModeBanner: false,
       home: isLoggedIn ? const HiddenDrawer() : const LoginPage(),
     );
   }
 }
-
