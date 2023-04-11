@@ -30,4 +30,14 @@ class ReusableMethods {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
   }
+
+  static Future<void> setUserId(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('id', id);
+  }
+
+  static Future<int?> getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id');
+  }
 }

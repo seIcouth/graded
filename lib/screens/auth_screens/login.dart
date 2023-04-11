@@ -26,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
 
     if (datauser.isNotEmpty) {
       if (datauser[0]['role'] == 'student') {
+        int id = int.parse(datauser[0]['id']);
+        ReusableMethods.setUserId(id);
         ReusableMethods.setLoggedInTrue();
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -33,6 +35,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       } else if (datauser[0]['role'] == 'instructor') {
+        int id = int.parse(datauser[0]['id']);
+        ReusableMethods.setUserId(id);
         ReusableMethods.setLoggedInTrue();
         Navigator.of(context).push(
           MaterialPageRoute(

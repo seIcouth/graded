@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:graded/models/home_course.dart';
 import 'package:graded/models/home_notification.dart' as N;
 import 'package:graded/resources/reusable_methods.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {

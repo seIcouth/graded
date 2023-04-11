@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/hidden_drawer.dart';
@@ -15,37 +16,45 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
 
   // controllers
-  final mail = TextEditingController();
-  final pass = TextEditingController();
-  final confirmPass = TextEditingController();
+  final nameController = TextEditingController();
+  final surnameController = TextEditingController();
+  final deptName = TextEditingController();
+  final mailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   //final role = TextEditingController();
   bool isStudent = true;
   bool isClicked = false;
 
   @override
   void dispose() {
-    mail.dispose();
-    pass.dispose();
-    confirmPass.dispose();
+    mailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     //role.dispose();
     super.dispose();
   }
 
   Future<String> register() async{
     final response = await http.post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
-      "mail": mail.text,
-      "password": pass.text,
-      "role": isStudent ? "student" : "instructor"
-      //"role": role.text,
+      "mail": mailController.text,
+      "password": passwordController.text,
+      "role": isStudent ? "student" : "instructor",
+      "name": nameController.text,
+      "surname": surnameController.text,
+      "deptName": deptName.text,
     });
 
+    List<dynamic> datauser = json.decode(response.body);
+    int id = int.parse(datauser[0]['id']);
+    ReusableMethods.setUserId(id);
     ReusableMethods.setLoggedInTrue();
 
     return response.body;
   }
 
   bool passwordConfirmed(){
-    return pass.text.trim() == confirmPass.text.trim();
+    return passwordController.text.trim() == confirmPasswordController.text.trim();
   }
 
   @override
@@ -119,7 +128,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       });
                                       // handle button 1 press
                                     },
-                                    child: const Text('Student'),
+                                    child: Stack(
+                                      children: [
+                                        const Align(
+                                          alignment: Alignment.center,
+                                          child: Text('Student'),
+                                        ),
+                                        Visibility(
+                                          visible: (isClicked && isStudent),
+                                          child: const Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Icon(Icons.check_circle)
+                                          )
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(
@@ -142,7 +165,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       });
                                       // handle button 2 press
                                     },
-                                    child: const Text('Instructor'),
+                                    child: Stack(
+                                      children: [
+                                        const Align(
+                                            alignment: Alignment.center,
+                                            child: Text('Instructor')
+                                        ),
+                                        Visibility(
+                                            visible: (isClicked && !isStudent),
+                                            child: const Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Icon(Icons.check_circle)
+                                            )
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -157,7 +194,67 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     cursorHeight: 16,
                     cursorWidth: 1.5,
                     cursorColor: ReusableMethods.colorDark,
-                    controller: mail,
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: 'Name',
+                      fillColor: Colors.grey[100],
+                      filled: true,
+                    ),
+                  ),
+                  const SizedBox(height: 14,),
+                  TextField(
+                    cursorHeight: 16,
+                    cursorWidth: 1.5,
+                    cursorColor: ReusableMethods.colorDark,
+                    controller: surnameController,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: 'Surname',
+                      fillColor: Colors.grey[100],
+                      filled: true,
+                    ),
+                  ),
+                  const SizedBox(height: 14,),
+                  TextField(
+                    cursorHeight: 16,
+                    cursorWidth: 1.5,
+                    cursorColor: ReusableMethods.colorDark,
+                    controller: deptName,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: 'Department',
+                      fillColor: Colors.grey[100],
+                      filled: true,
+                    ),
+                  ),
+                  const SizedBox(height: 14,),
+                  TextField(
+                    cursorHeight: 16,
+                    cursorWidth: 1.5,
+                    cursorColor: ReusableMethods.colorDark,
+                    controller: mailController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: const BorderSide(color: Colors.white),
@@ -180,7 +277,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     cursorHeight: 16,
                     cursorWidth: 1.5,
                     cursorColor: ReusableMethods.colorDark,
-                    controller: pass,
+                    controller: passwordController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: const BorderSide(color: Colors.white),
@@ -203,7 +300,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     cursorHeight: 16,
                     cursorWidth: 1.5,
                     cursorColor: ReusableMethods.colorDark,
-                    controller: confirmPass,
+                    controller: confirmPasswordController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide: const BorderSide(color: Colors.white),
@@ -221,7 +318,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 10,),
                   ElevatedButton(
                     onPressed: () async {
-                      if(mail.text.isEmpty || pass.text.isEmpty || confirmPass.text.isEmpty){
+                      if(mailController.text.isEmpty || passwordController.text.isEmpty || confirmPasswordController.text.isEmpty){
                         Flushbar(
                           message: "Please fill all necessary fields.",
                           duration: const Duration(seconds: 3),
@@ -235,7 +332,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ).show(context);
                       }
                       else{
-                        if(ReusableMethods.isValidEmail(mail.text)){
+                        if(ReusableMethods.isValidEmail(mailController.text)){
                           if(!passwordConfirmed()) {
                             Flushbar(
                               message: "Given passwords do not match!",
@@ -244,7 +341,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ).show(context);
                           }
                           else{
-                            if(pass.text.length>5){
+                            if(passwordController.text.length>5){
                               try{
                                 await register();
                                 Navigator.of(context).push(
@@ -325,6 +422,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 30,)
                 ],
               ),
             ),
