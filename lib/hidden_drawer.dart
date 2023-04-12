@@ -19,33 +19,37 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
   void initState() {
     super.initState();
 
-    final textStyle = TextStyle(
+    final textStyleDark = TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 18,
         color: ReusableMethods.colorDark);
+    var textStyleLogOut = TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        color: ReusableMethods.colorAssignment);
 
     _pages = [
       ScreenHiddenDrawer(
           ItemHiddenMenu(
             name: 'Home',
-            baseStyle: textStyle,
-            selectedStyle: textStyle,
+            baseStyle: textStyleDark,
+            selectedStyle: textStyleDark,
             colorLineSelected: ReusableMethods.colorDark,
           ),
           const HomePage()),
       ScreenHiddenDrawer(
           ItemHiddenMenu(
             name: 'Profile',
-            baseStyle: textStyle,
-            selectedStyle: textStyle,
+            baseStyle: textStyleDark,
+            selectedStyle: textStyleDark,
             colorLineSelected: ReusableMethods.colorDark,
           ),
           const ProfilePage()),
       ScreenHiddenDrawer(
         ItemHiddenMenu(
             name: 'Log out',
-            baseStyle: textStyle,
-            selectedStyle: textStyle,
+            baseStyle: textStyleLogOut,
+            selectedStyle: textStyleLogOut,
             colorLineSelected: ReusableMethods.colorDark,
             onTap: () async {
               ReusableMethods.setLoggedInFalse();
@@ -64,6 +68,10 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
   Widget build(BuildContext context) {
     return HiddenDrawerMenu(
       backgroundColorMenu: ReusableMethods.colorLight,
+      backgroundMenu: const DecorationImage(
+          image: AssetImage('assets/images/logo_straight.png'),
+          alignment: Alignment(-0.80, -0.75),
+          fit: BoxFit.scaleDown),
       screens: _pages,
       initPositionSelected: 0,
       slidePercent: 60,

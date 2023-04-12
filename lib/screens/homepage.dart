@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:graded/models/home_course.dart';
 import 'package:graded/models/home_notification.dart' as N;
 import 'package:graded/resources/reusable_methods.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -216,11 +215,29 @@ class _HomePageState extends State<HomePage> {
   Widget courseCard(BuildContext context, HomeCourse homeCourse) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
-      child: Card(
-        color: ReusableMethods.colorDark,
-        elevation: 6,
-        shadowColor: ReusableMethods.colorDark,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            stops: const [
+              0.1,
+              0.4,
+              0.6,
+              0.9,
+            ],
+            colors: [
+              ReusableMethods.colorGrades,
+              ReusableMethods.colorPeople,
+              ReusableMethods.colorAssignment,
+              ReusableMethods.colorAnnouncement,
+            ],
+          ),
+        ),
+        //elevation: 6,
+        //shadowColor: ReusableMethods.colorDark,
+        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
