@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../resources/reusable_methods.dart';
-import 'auth_screens/login.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'auth_screens/login.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -22,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> getUserInfo() async {
     int? id = await ReusableMethods.getUserId();
+
     // Construct the URL with the user ID
     String url = 'http://10.0.2.2/graded/getuserinfo.php?id=$id';
 
@@ -41,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
       name = user['name'];
       surname = user['surname'];
       deptName = user['deptName'];
-      role = user['role'];
+      role = user['role'] == 'student' ? 'Student':'Instructor';
       mail = user['mail'];
 
       //print("$name - $surname - $deptName - $role - $mail");
@@ -49,6 +52,15 @@ class _ProfilePageState extends State<ProfilePage> {
       // If the response is not successful
       print('Failed to get user info. Status code: ${response.statusCode}');
     }
+  }
+
+  void logout() async{
+    await ReusableMethods.setLoggedInFalse();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const LoginPage(),
+      ),
+    );
   }
 
   @override
@@ -86,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget buildCoverImage() => Container(
         color: ReusableMethods.colorLight,
         child: Image.asset(
-          'assets/images/background_library.jpg',
+          'assets/images/university_cartoon.jpg',
           width: double.infinity,
           //height: coverHeight,
           fit: BoxFit.cover,
@@ -102,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30.0),
           child: Image.asset(
-            role == "student"
+            role == "Student"
                 ? 'assets/images/student.png'
                 : 'assets/images/instructor.png',
             width: 512 / 4,
@@ -134,82 +146,207 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget buildContent() {
     return Padding(
-      padding: const EdgeInsets.all(0.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              "$name $surname",
-              style: TextStyle(
-                fontSize: 24,
-                color: ReusableMethods.colorDark,
-                fontWeight: FontWeight.bold,
+          const SizedBox(height: 36,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(width: 16,),
+              Icon(
+                  Icons.account_circle_rounded,
+                  size: 36,
+                  color: ReusableMethods.colorPeople,
               ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              role,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
+              const SizedBox(width: 48,),
+              Text(
+                "$name $surname",
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: CupertinoColors.systemGrey
+                ),
               ),
-            ),
+            ],
           ),
           const SizedBox(
-            height: 10.0,
+            height: 8.0,
           ),
-          Divider(
-            color: ReusableMethods.colorDark, //color of divider
+          const Divider(
+            color: Colors.grey, //color of divider
             height: 5, //height spacing of divider
             thickness: 2.0, //thickness of divider line
-            indent: 50, //spacing at the start of divider
-            endIndent: 50, //spacing at the end of divider
+            indent: 0, //spacing at the start of divider
+            endIndent: 0, //spacing at the end of divider
           ),
           const SizedBox(
-            height: 10.0,
+            height: 24.0,
           ),
-          Container(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(Icons.mail_rounded,
-                      color: ReusableMethods.colorDark),
-                  shape: RoundedRectangleBorder(
-                    side:
-                        BorderSide(width: 1, color: ReusableMethods.colorDark),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  title: Text(
-                    mail,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Colors.grey),
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(width: 16,),
+              Icon(
+                  Icons.school_rounded,
+                  size: 36,
+                  color: ReusableMethods.colorPeople
+              ),
+              const SizedBox(width: 48,),
+              Text(
+                role,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: CupertinoColors.systemGrey),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const Divider(
+            color: Colors.grey, //color of divider
+            height: 5, //height spacing of divider
+            thickness: 2.0, //thickness of divider line
+            indent: 0, //spacing at the start of divider
+            endIndent: 0, //spacing at the end of divider
+          ),
+          const SizedBox(
+            height: 24.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(width: 16,),
+              Icon(
+                  Icons.mail_rounded,
+                  size: 36,
+                  color: ReusableMethods.colorPeople
+              ),
+              const SizedBox(width: 48,),
+              Text(
+                mail,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: CupertinoColors.systemGrey
                 ),
-                ListTile(
-                  leading: Icon(Icons.mail_rounded,
-                      color: ReusableMethods.colorDark),
-                  shape: RoundedRectangleBorder(
-                    side:
-                        BorderSide(width: 1, color: ReusableMethods.colorDark),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  title: Text(
-                    deptName,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Colors.grey),
-                  ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const Divider(
+            color: Colors.grey, //color of divider
+            height: 5, //height spacing of divider
+            thickness: 2.0, //thickness of divider line
+            indent: 0, //spacing at the start of divider
+            endIndent: 0, //spacing at the end of divider
+          ),
+          const SizedBox(
+            height: 24.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(width: 16,),
+              Icon(
+                  Icons.school_rounded,
+                  size: 36,
+                  color: ReusableMethods.colorPeople
+              ),
+              const SizedBox(width: 48,),
+              Text(
+                deptName,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: CupertinoColors.systemGrey
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          const Divider(
+            color: Colors.grey, //color of divider
+            height: 5, //height spacing of divider
+            thickness: 2.0, //thickness of divider line
+            indent: 0, //spacing at the start of divider
+            endIndent: 0, //spacing at the end of divider
+          ),
+          const SizedBox(
+            height: 36.0,
+          ),
+          ElevatedButton(
+            onPressed: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Warning'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      MaterialButton(
+                        child: const Text('No'),
+                        onPressed: () => Navigator.of(context).pop(false),
+                      ),
+                      MaterialButton(
+                        child: const Text('Yes'),
+                        onPressed: () => Navigator.of(context).pop(true),
+                      ),
+                    ],
+                  );
+                },
+              ).then((value) {
+                if (value) {
+                  // Perform the delete action here
+                  logout();
+                  Navigator.pop(context);
+                }
+              });
+            },
+            style: ButtonStyle(
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+              // Set overlayColor to Colors.transparent to remove the purple shadow
+              overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+              elevation: MaterialStateProperty.all<double>(0),
             ),
-          )
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.deepPurple[800]!,
+                    Colors.deepPurple[500]!,
+                    Colors.deepPurple[300]!,
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: const Center(
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 30,)
         ],
       ),
     );
