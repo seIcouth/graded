@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import '../resources/reusable_methods.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -14,7 +15,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final double coverHeight = 240;
+  final double coverHeight = 150;
   final double profileHeight = 144;
   late String name;
   late String surname;
@@ -44,7 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
       name = user['name'];
       surname = user['surname'];
       deptName = user['deptName'];
-      role = user['role'] == 'student' ? 'Student':'Instructor';
+      role = user['role'] == 'student' ? 'Student' : 'Instructor';
       mail = user['mail'];
 
       //print("$name - $surname - $deptName - $role - $mail");
@@ -54,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void logout() async{
+  void logout() async {
     await ReusableMethods.setLoggedInFalse();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -66,6 +67,42 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            CupertinoIcons.bars,
+            color: ReusableMethods.colorLight,
+          ),
+          onPressed: () {
+            SimpleHiddenDrawerController.of(context).open();
+          },
+        ),
+        title: Text(
+          "Profile",
+          style: TextStyle(
+            color: ReusableMethods.colorLight,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              stops: const [
+                0.1,
+                0.4,
+                0.9,
+              ],
+              colors: [
+                ReusableMethods.colorProfile3,
+                ReusableMethods.colorProfile2,
+                ReusableMethods.colorProfile1,
+              ],
+            ),
+          ),
+        ),
+      ),
       backgroundColor: ReusableMethods.colorLight,
       body: FutureBuilder(
         future: getUserInfo(),
@@ -109,7 +146,20 @@ class _ProfilePageState extends State<ProfilePage> {
         decoration: BoxDecoration(
           border: Border.all(width: 3.5, color: ReusableMethods.colorDark),
           borderRadius: BorderRadius.circular(30.0),
-          color: ReusableMethods.colorLight,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            stops: const [
+              0.1,
+              0.4,
+              0.9,
+            ],
+            colors: [
+              ReusableMethods.colorProfile3,
+              ReusableMethods.colorProfile2,
+              ReusableMethods.colorProfile1,
+            ],
+          ),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30.0),
@@ -126,16 +176,32 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget buildTop() {
     final top = coverHeight - profileHeight / 2;
-    final bottom = profileHeight / 2;
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
       children: [
         Container(
-            margin: EdgeInsets.only(
-              bottom: bottom,
+          height: coverHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              stops: const [
+                0.1,
+                0.4,
+                0.9,
+              ],
+              colors: [
+                ReusableMethods.colorProfile3,
+                ReusableMethods.colorProfile2,
+                ReusableMethods.colorProfile1,
+              ],
             ),
-            child: buildCoverImage()),
+            borderRadius: BorderRadius.vertical(
+                bottom: Radius.elliptical(
+                    MediaQuery.of(context).size.width, 120.0)),
+          ),
+        ),
         Positioned(
           top: top,
           child: buildProfileImage(),
@@ -146,27 +212,43 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget buildContent() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.fromLTRB(8.0, 50.0, 8.0, 0.0),
       child: Column(
         children: [
-          const SizedBox(height: 36,),
+          const SizedBox(
+            height: 36,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(width: 16,),
-              Icon(
-                  Icons.account_circle_rounded,
+              const SizedBox(
+                width: 16,
+              ),
+              ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (Rect bounds) => RadialGradient(
+                  center: Alignment.topCenter,
+                  stops: const [.9, 1],
+                  colors: [
+                    ReusableMethods.colorProfile1,
+                    ReusableMethods.colorProfile2,
+                  ],
+                ).createShader(bounds),
+                child: Icon(
+                  CupertinoIcons.person_solid,
                   size: 36,
                   color: ReusableMethods.colorPeople,
+                ),
               ),
-              const SizedBox(width: 48,),
+              const SizedBox(
+                width: 48,
+              ),
               Text(
                 "$name $surname",
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
-                    color: CupertinoColors.systemGrey
-                ),
+                    color: CupertinoColors.systemGrey),
               ),
             ],
           ),
@@ -186,13 +268,25 @@ class _ProfilePageState extends State<ProfilePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(width: 16,),
-              Icon(
-                  Icons.school_rounded,
-                  size: 36,
-                  color: ReusableMethods.colorPeople
+              const SizedBox(
+                width: 16,
               ),
-              const SizedBox(width: 48,),
+              ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (Rect bounds) => RadialGradient(
+                  center: Alignment.topCenter,
+                  stops: const [.9, 1],
+                  colors: [
+                    ReusableMethods.colorProfile1,
+                    ReusableMethods.colorProfile2,
+                  ],
+                ).createShader(bounds),
+                child: Icon(CupertinoIcons.briefcase_fill,
+                    size: 36, color: ReusableMethods.colorPeople),
+              ),
+              const SizedBox(
+                width: 48,
+              ),
               Text(
                 role,
                 style: const TextStyle(
@@ -218,20 +312,31 @@ class _ProfilePageState extends State<ProfilePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(width: 16,),
-              Icon(
-                  Icons.mail_rounded,
-                  size: 36,
-                  color: ReusableMethods.colorPeople
+              const SizedBox(
+                width: 16,
               ),
-              const SizedBox(width: 48,),
+              ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (Rect bounds) => RadialGradient(
+                  center: Alignment.topCenter,
+                  stops: const [.9, 1],
+                  colors: [
+                    ReusableMethods.colorProfile1,
+                    ReusableMethods.colorProfile2,
+                  ],
+                ).createShader(bounds),
+                child: Icon(CupertinoIcons.mail_solid,
+                    size: 36, color: ReusableMethods.colorPeople),
+              ),
+              const SizedBox(
+                width: 48,
+              ),
               Text(
                 mail,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
-                    color: CupertinoColors.systemGrey
-                ),
+                    color: CupertinoColors.systemGrey),
               ),
             ],
           ),
@@ -251,20 +356,31 @@ class _ProfilePageState extends State<ProfilePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(width: 16,),
-              Icon(
-                  Icons.school_rounded,
-                  size: 36,
-                  color: ReusableMethods.colorPeople
+              const SizedBox(
+                width: 16,
               ),
-              const SizedBox(width: 48,),
+              ShaderMask(
+                blendMode: BlendMode.srcIn,
+                shaderCallback: (Rect bounds) => RadialGradient(
+                  center: Alignment.topCenter,
+                  stops: const [.9, 1],
+                  colors: [
+                    ReusableMethods.colorProfile1,
+                    ReusableMethods.colorProfile2,
+                  ],
+                ).createShader(bounds),
+                child: Icon(Icons.school_rounded,
+                    size: 36, color: ReusableMethods.colorPeople),
+              ),
+              const SizedBox(
+                width: 48,
+              ),
               Text(
                 deptName,
                 style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
-                    color: CupertinoColors.systemGrey
-                ),
+                    color: CupertinoColors.systemGrey),
               ),
             ],
           ),
@@ -282,20 +398,48 @@ class _ProfilePageState extends State<ProfilePage> {
             height: 36.0,
           ),
           ElevatedButton(
-            onPressed: (){
+            onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Warning'),
+                    actionsAlignment: MainAxisAlignment.center,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                    backgroundColor: ReusableMethods.colorLight,
+                    contentTextStyle:
+                        TextStyle(color: ReusableMethods.colorDark),
+                    title: Text(
+                      'Warning',
+                      style: TextStyle(
+                          color: ReusableMethods.colorDark,
+                          fontWeight: FontWeight.bold),
+                    ),
                     content: const Text('Are you sure you want to logout?'),
                     actions: [
                       MaterialButton(
-                        child: const Text('No'),
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0))),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                              color: ReusableMethods.colorDark,
+                              fontWeight: FontWeight.bold),
+                        ),
                         onPressed: () => Navigator.of(context).pop(false),
                       ),
                       MaterialButton(
-                        child: const Text('Yes'),
+                        shape: const RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0))),
+                        color: ReusableMethods.colorProfile2,
+                        child: Text(
+                          'Logout',
+                          style: TextStyle(
+                              color: ReusableMethods.colorLight,
+                              fontWeight: FontWeight.bold),
+                        ),
                         onPressed: () => Navigator.of(context).pop(true),
                       ),
                     ],
@@ -315,9 +459,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
               ),
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+              backgroundColor:
+                  MaterialStateProperty.all<Color>(Colors.transparent),
               // Set overlayColor to Colors.transparent to remove the purple shadow
-              overlayColor: MaterialStateProperty.all<Color>(Colors.transparent),
+              overlayColor:
+                  MaterialStateProperty.all<Color>(Colors.transparent),
               elevation: MaterialStateProperty.all<double>(0),
             ),
             child: Container(
@@ -325,28 +471,40 @@ class _ProfilePageState extends State<ProfilePage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.deepPurple[800]!,
-                    Colors.deepPurple[500]!,
-                    Colors.deepPurple[300]!,
+                    ReusableMethods.colorProfile1,
+                    ReusableMethods.colorProfile2,
+                    ReusableMethods.colorProfile3,
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              child: const Center(
-                child: Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Icon(
+                    CupertinoIcons.square_arrow_right,
+                    color: Colors.white,
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 30,)
+          const SizedBox(
+            height: 20,
+          )
         ],
       ),
     );

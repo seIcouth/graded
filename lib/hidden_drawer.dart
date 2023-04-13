@@ -67,6 +67,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
   @override
   Widget build(BuildContext context) {
     return HiddenDrawerMenu(
+      disableAppBarDefault: true,
       backgroundColorMenu: ReusableMethods.colorLight,
       backgroundMenu: const DecorationImage(
           image: AssetImage('assets/images/logo_straight.png'),

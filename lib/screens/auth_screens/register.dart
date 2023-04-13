@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/hidden_drawer.dart';
@@ -14,7 +15,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-
   // controllers
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
@@ -35,8 +35,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  Future<String> register() async{
-    final response = await http.post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
+  Future<String> register() async {
+    final response = await http
+        .post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
       "mail": mailController.text,
       "password": passwordController.text,
       "role": isStudent ? "student" : "instructor",
@@ -53,8 +54,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return response.body;
   }
 
-  bool passwordConfirmed(){
-    return passwordController.text.trim() == confirmPasswordController.text.trim();
+  bool passwordConfirmed() {
+    return passwordController.text.trim() ==
+        confirmPasswordController.text.trim();
   }
 
   @override
@@ -84,7 +86,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14,),
+                  const SizedBox(
+                    height: 14,
+                  ),
                   Container(
                     decoration: BoxDecoration(
                       color: const Color(0xfff5f5f5),
@@ -96,7 +100,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: SizedBox(
                       width: double.infinity,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15.0, vertical: 20),
                         child: Column(
                           children: [
                             Text(
@@ -107,19 +112,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: ReusableMethods.colorDark,
                               ),
                             ),
-                            const SizedBox(height: 8,),
+                            const SizedBox(
+                              height: 8,
+                            ),
                             Flex(
                               direction: Axis.horizontal,
                               children: [
                                 Expanded(
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12.0),
-                                          )
-                                      ),
-                                      backgroundColor: (isClicked && isStudent) ? MaterialStateProperty.all(const Color(0xff808080)) : MaterialStateProperty.all(ReusableMethods.colorDark),
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                      )),
+                                      backgroundColor: (isClicked && isStudent)
+                                          ? MaterialStateProperty.all(
+                                              const Color(0xff808080))
+                                          : MaterialStateProperty.all(
+                                              ReusableMethods.colorDark),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -135,12 +147,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           child: Text('Student'),
                                         ),
                                         Visibility(
-                                          visible: (isClicked && isStudent),
-                                          child: const Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Icon(Icons.check_circle)
-                                          )
-                                        ),
+                                            visible: (isClicked && isStudent),
+                                            child: const Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Icon(CupertinoIcons
+                                                    .check_mark_circled))),
                                       ],
                                     ),
                                   ),
@@ -151,12 +162,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 Expanded(
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      shape: MaterialStateProperty.all<
+                                              RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12.0),
-                                          )
-                                      ),
-                                      backgroundColor: (isClicked && !isStudent) ? MaterialStateProperty.all(const Color(0xff808080)) : MaterialStateProperty.all(ReusableMethods.colorDark),
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                      )),
+                                      backgroundColor: (isClicked && !isStudent)
+                                          ? MaterialStateProperty.all(
+                                              const Color(0xff808080))
+                                          : MaterialStateProperty.all(
+                                              ReusableMethods.colorDark),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -169,15 +185,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       children: [
                                         const Align(
                                             alignment: Alignment.center,
-                                            child: Text('Instructor')
-                                        ),
+                                            child: Text('Instructor')),
                                         Visibility(
                                             visible: (isClicked && !isStudent),
                                             child: const Align(
                                                 alignment: Alignment.centerLeft,
-                                                child: Icon(Icons.check_circle)
-                                            )
-                                        ),
+                                                child: Icon(CupertinoIcons
+                                                    .check_mark_circled))),
                                       ],
                                     ),
                                   ),
@@ -189,7 +203,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14,),
+                  const SizedBox(
+                    height: 14,
+                  ),
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
@@ -201,7 +217,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Name',
@@ -209,7 +226,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                     ),
                   ),
-                  const SizedBox(height: 14,),
+                  const SizedBox(
+                    height: 14,
+                  ),
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
@@ -221,7 +240,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Surname',
@@ -229,7 +249,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                     ),
                   ),
-                  const SizedBox(height: 14,),
+                  const SizedBox(
+                    height: 14,
+                  ),
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
@@ -241,7 +263,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Department',
@@ -249,7 +272,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                     ),
                   ),
-                  const SizedBox(height: 14,),
+                  const SizedBox(
+                    height: 14,
+                  ),
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
@@ -261,7 +286,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
@@ -284,7 +310,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Password',
@@ -307,7 +334,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Confirm password',
@@ -315,66 +343,84 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       filled: true,
                     ),
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   ElevatedButton(
                     onPressed: () async {
-                      if(mailController.text.isEmpty || passwordController.text.isEmpty || confirmPasswordController.text.isEmpty){
+                      if (mailController.text.isEmpty ||
+                          passwordController.text.isEmpty ||
+                          confirmPasswordController.text.isEmpty) {
                         Flushbar(
                           message: "Please fill all necessary fields.",
                           duration: const Duration(seconds: 3),
-                          margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 50),
+                          margin: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom +
+                                  50),
                         ).show(context);
-                      } else if(!isClicked){
+                      } else if (!isClicked) {
                         Flushbar(
                           message: "Please select a role.",
                           duration: const Duration(seconds: 3),
-                          margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 50),
+                          margin: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom +
+                                  50),
                         ).show(context);
-                      }
-                      else{
-                        if(ReusableMethods.isValidEmail(mailController.text)){
-                          if(!passwordConfirmed()) {
+                      } else {
+                        if (ReusableMethods.isValidEmail(mailController.text)) {
+                          if (!passwordConfirmed()) {
                             Flushbar(
                               message: "Given passwords do not match!",
                               duration: const Duration(seconds: 3),
-                              margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 50),
+                              margin: EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).viewInsets.bottom +
+                                          50),
                             ).show(context);
-                          }
-                          else{
-                            if(passwordController.text.length>5){
-                              try{
+                          } else {
+                            if (passwordController.text.length > 5) {
+                              try {
                                 await register();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => const HiddenDrawer(),
                                   ),
                                 );
-                              } catch(e){print(e);}
-                            }else{
+                              } catch (e) {
+                                print(e);
+                              }
+                            } else {
                               Flushbar(
-                                message: "The password should be at least 6 characters.",
+                                message:
+                                    "The password should be at least 6 characters.",
                                 duration: const Duration(seconds: 3),
-                                margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 50),
+                                margin: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context)
+                                            .viewInsets
+                                            .bottom +
+                                        50),
                               ).show(context);
                             }
                           }
-                        } else{
+                        } else {
                           Flushbar(
                             message: "The email address is badly formatted.",
                             duration: const Duration(seconds: 3),
-                            margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 50),
+                            margin: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom +
+                                        50),
                           ).show(context);
                         }
                       }
-
                     },
                     style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          )
-                      ),
-                      backgroundColor: MaterialStateProperty.all(ReusableMethods.colorDark),
+                        borderRadius: BorderRadius.circular(12.0),
+                      )),
+                      backgroundColor:
+                          MaterialStateProperty.all(ReusableMethods.colorDark),
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(20),
@@ -399,16 +445,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text(
                         'Already have an account?',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff153243),
-                          fontSize: 16
-                        ),
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff153243),
+                            fontSize: 16),
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const LoginPage()),
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
                           );
                         },
                         child: const Text(
@@ -416,13 +462,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           style: TextStyle(
                               fontSize: 16,
                               color: Colors.blue,
-                              fontWeight: FontWeight.bold
-                          ),
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30,)
+                  const SizedBox(
+                    height: 30,
+                  )
                 ],
               ),
             ),

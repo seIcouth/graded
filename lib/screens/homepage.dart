@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:graded/models/home_course.dart';
 import 'package:graded/models/home_notification.dart' as N;
 import 'package:graded/resources/reusable_methods.dart';
+import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -81,6 +83,24 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            CupertinoIcons.bars,
+            color: ReusableMethods.colorLight,
+          ),
+          onPressed: () {
+            SimpleHiddenDrawerController.of(context).open();
+          },
+        ),
+        title: Text(
+          "Home",
+          style: TextStyle(
+            color: ReusableMethods.colorLight,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       backgroundColor: ReusableMethods.colorLight,
       extendBodyBehindAppBar: true,
       body: SafeArea(
@@ -108,8 +128,12 @@ class _HomePageState extends State<HomePage> {
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.notifications_none_outlined,
+                                    CupertinoIcons.bell,
+                                    size: 30,
                                     color: ReusableMethods.colorDark,
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
                                   ),
                                   Text(
                                     " Recent Notifications",
@@ -123,8 +147,7 @@ class _HomePageState extends State<HomePage> {
                                   const Spacer(),
                                   IconButton(
                                     onPressed: () {},
-                                    icon: const Icon(
-                                        Icons.arrow_forward_ios_rounded),
+                                    icon: const Icon(CupertinoIcons.forward),
                                     color: ReusableMethods.colorDark,
                                   ),
                                 ],
@@ -168,8 +191,11 @@ class _HomePageState extends State<HomePage> {
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.library_books_outlined,
+                                    CupertinoIcons.collections,
                                     color: ReusableMethods.colorDark,
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
                                   ),
                                   Text(
                                     " Courses",
@@ -183,8 +209,7 @@ class _HomePageState extends State<HomePage> {
                                   const Spacer(),
                                   IconButton(
                                     onPressed: () {},
-                                    icon: const Icon(
-                                        Icons.arrow_forward_ios_rounded),
+                                    icon: const Icon(CupertinoIcons.forward),
                                     color: ReusableMethods.colorDark,
                                   ),
                                 ],
@@ -299,7 +324,7 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           onPressed: () {},
                           icon: Icon(
-                            Icons.people,
+                            CupertinoIcons.person_2_fill,
                             color: ReusableMethods.colorPeople,
                           ),
                           tooltip: "people",
@@ -307,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                         IconButton(
                           onPressed: () {},
                           icon: Icon(
-                            Icons.leaderboard_rounded,
+                            CupertinoIcons.chart_bar_alt_fill,
                             color: ReusableMethods.colorGrades,
                           ),
                           tooltip: "grades",
