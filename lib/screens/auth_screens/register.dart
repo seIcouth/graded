@@ -36,14 +36,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<String> register() async {
-    final response = await http
-        .post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
+    final response = await http.post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
       "mail": mailController.text,
       "password": passwordController.text,
       "role": isStudent ? "student" : "instructor",
       "name": nameController.text,
       "surname": surnameController.text,
       "deptName": deptName.text,
+      "addToInstructor": isStudent ? "0" : "1", // Add this parameter to indicate if the user should be added to the instructor table
     });
 
     List<dynamic> datauser = json.decode(response.body);
