@@ -132,16 +132,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget buildCoverImage() => Container(
-        color: ReusableMethods.colorLight,
-        child: Image.asset(
-          'assets/images/university_cartoon.jpg',
-          width: double.infinity,
-          //height: coverHeight,
-          fit: BoxFit.cover,
-        ),
-      );
-
   Widget buildProfileImage() => Container(
         decoration: BoxDecoration(
           border: Border.all(width: 3.5, color: ReusableMethods.colorDark),

@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import 'package:graded/models/home_course.dart';
 import 'package:graded/models/home_notification.dart' as N;
 import 'package:graded/resources/reusable_methods.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,10 +20,131 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _index = 0;
 
+  late List<dynamic> courses;
+  List<String> semesters = ['Semester', 'Fall', 'Winter', 'Spring', 'Summer'];
+  List<int> years = [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ];
+  List<int> credits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  late int instructorID;
+  String? courseID;
+  String? name;
+  String? deptName;
+  int credit = 0;
+  String semester = 'Semester';
+  int year = 2020;
+
+  late String role;
+
+  Future<List<dynamic>> getCourses() async {
+    int? id = await ReusableMethods.getUserId();
+    await getRole();
+
+    // Construct the URL with the instructor ID
+    String url =
+        'http://10.0.2.2/graded/getcoursesbyinstructorid.php?instructorID=$id';
+
+    // Make an HTTP GET request to the PHP script
+    http.Response response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // If the response is successful (status code 200)
+      // Parse the response body as JSON
+      courses = json.decode(response.body);
+
+      //print(courses);
+      // Return the list of courses
+      return courses;
+    } else {
+      // If the response is not successful
+      print('Failed to get courses. Status code: ${response.statusCode}');
+      return [];
+    }
+  }
+
+  Future<void> getRole() async {
+    int? id = await ReusableMethods.getUserId();
+
+    // Construct the URL with the user ID
+    String url = 'http://10.0.2.2/graded/getuserinfo.php?id=$id';
+
+    // Make an HTTP GET request to the PHP script
+    http.Response response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // If the response is successful (status code 200)
+      // Parse the response body as JSON
+      List<dynamic> userData = json.decode(response.body);
+
+      // Access the user data from the JSON response
+      // assuming the response is an array containing a single user object
+      Map<String, dynamic> user = userData.isNotEmpty ? userData[0] : {};
+
+      // Use the user data as needed
+      role = user['role'] == 'student' ? 'Student' : 'Instructor';
+
+      //print("$name - $surname - $deptName - $role - $mail");
+    } else {
+      // If the response is not successful
+      print('Failed to get user info. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<void> createCourse(
+      int parInstructorID,
+      String parCourseID,
+      String parName,
+      String parDeptName,
+      int parCredit,
+      String parSemester,
+      int parYear) async {
+    try {
+      // Prepare the request body as a Map
+      final requestBody = {
+        'instructorID': parInstructorID.toString(), // Convert to String
+        'courseID': parCourseID,
+        'name': parName,
+        'deptName': parDeptName,
+        'credit': parCredit.toString(), // Convert to String
+        'sectionID': '1',
+        'semester': parSemester,
+        'year': parYear.toString(), // Convert to String
+      };
+
+      // Send a POST request to the createcourse.php file on server
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2/graded/createcourse.php'),
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        // Course created successfully
+        print('Course created successfully');
+      } else {
+        // Handle any errors from the server
+        print('Failed to create course: ${response.body}');
+      }
+    } catch (e) {
+      // Handle any errors locally
+      print('Failed to create course: $e');
+    }
+  }
+
   static String formatDate(DateTime date) =>
       DateFormat("MMMM d - hh:mm").format(date);
 
-  List<HomeCourse> dummyCourses = [
+  List<HomeCourse> a = [
     HomeCourse(courseName: "Art of Computing", courseCode: "COMP101"),
     HomeCourse(courseName: "Calculus I", courseCode: "MATH151"),
     HomeCourse(courseName: "Turkish I", courseCode: "TURK101"),
@@ -216,12 +341,43 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: dummyCourses.length,
-                            itemBuilder: (context, i) {
-                              return courseCard(context, dummyCourses[i]);
+                          FutureBuilder(
+                            future: getCourses(),
+                            builder: (context, AsyncSnapshot<void> snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              }
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.waiting:
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      backgroundColor:
+                                          ReusableMethods.colorLight,
+                                      color: ReusableMethods.colorDark,
+                                    ),
+                                  );
+                                default:
+                                  return courses.isEmpty
+                                      ? Image.asset(
+                                          role == "Instructor"
+                                              ? 'assets/images/no_course_inst.png'
+                                              : 'assets/images/no_course_std.png',
+                                          width: double.infinity,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: courses.length,
+                                          itemBuilder: (context, i) {
+                                            return courseCard(
+                                                context,
+                                                courses[i]['courseID'],
+                                                courses[i]['name']);
+                                          },
+                                        );
+                              }
                             },
                           ),
                         ],
@@ -234,10 +390,419 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+      floatingActionButton: FutureBuilder(
+        future: getRole(),
+        builder: (context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return const Text("");
+            default:
+              return Visibility(
+                visible: role == 'Instructor',
+                child: SpeedDial(
+                  icon: Icons.library_add_rounded,
+                  activeIcon: CupertinoIcons.multiply,
+                  foregroundColor: ReusableMethods.colorLight,
+                  overlayColor: ReusableMethods.colorDark,
+                  overlayOpacity: 0.5,
+                  children: [
+                    SpeedDialChild(
+                        child: Icon(
+                          Icons.library_add_outlined,
+                          color: ReusableMethods.colorDark,
+                        ),
+                        label: 'Add Course',
+                        labelStyle: TextStyle(color: ReusableMethods.colorDark),
+                        labelBackgroundColor: ReusableMethods.colorLight,
+                        backgroundColor: ReusableMethods.colorLight,
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: ReusableMethods.colorLight,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                                content: Stack(
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Create a Course',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 24.0,
+                                                color:
+                                                    ReusableMethods.colorDark,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 20.0,
+                                          ),
+                                          Form(
+                                            child: Column(
+                                              children: [
+                                                TextFormField(
+                                                  onChanged: (value) {
+                                                    courseID = value;
+                                                  },
+                                                  keyboardType:
+                                                      TextInputType.name,
+                                                  decoration: InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        width: 5,
+                                                        color: ReusableMethods
+                                                            .colorDark,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                    ),
+                                                    labelText: 'Course Code',
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15.0),
+                                                TextFormField(
+                                                  onChanged: (value) {
+                                                    name = value;
+                                                  },
+                                                  keyboardType:
+                                                      TextInputType.name,
+                                                  decoration: InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                          width: 5,
+                                                          color: ReusableMethods
+                                                              .colorDark,
+                                                        ),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                      ),
+                                                      labelText: 'Course Name'),
+                                                ),
+                                                const SizedBox(height: 15.0),
+                                                TextFormField(
+                                                  onChanged: (value) {
+                                                    deptName = value;
+                                                  },
+                                                  keyboardType:
+                                                      TextInputType.name,
+                                                  decoration: InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        width: 5,
+                                                        color: ReusableMethods
+                                                            .colorDark,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                    ),
+                                                    labelText:
+                                                        'Department Name',
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15.0),
+                                                DropdownButtonFormField(
+                                                    dropdownColor:
+                                                        ReusableMethods
+                                                            .colorLight,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    decoration: InputDecoration(
+                                                        border: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            borderSide: BorderSide(
+                                                                width: 1,
+                                                                color: ReusableMethods
+                                                                    .colorDark))),
+                                                    value: semester,
+                                                    items: semesters
+                                                        .map((item) =>
+                                                            DropdownMenuItem(
+                                                              value: item,
+                                                              child: Text(
+                                                                  '$item',
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          16)),
+                                                            ))
+                                                        .toList(),
+                                                    onChanged: (item) =>
+                                                        setState(
+                                                          () =>
+                                                              semester = item!,
+                                                        )),
+                                                const SizedBox(height: 15.0),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      'Credits:  ',
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 65,
+                                                      child:
+                                                          DropdownButtonFormField(
+                                                              dropdownColor:
+                                                                  ReusableMethods
+                                                                      .colorLight,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              decoration: InputDecoration(
+                                                                  border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20),
+                                                                      borderSide: BorderSide(
+                                                                          width:
+                                                                              1,
+                                                                          color: ReusableMethods
+                                                                              .colorDark))),
+                                                              value: credit,
+                                                              items: credits
+                                                                  .map((item) =>
+                                                                      DropdownMenuItem(
+                                                                        value:
+                                                                            item,
+                                                                        child: Text(
+                                                                            '$item',
+                                                                            style:
+                                                                                const TextStyle(fontSize: 14)),
+                                                                      ))
+                                                                  .toList(),
+                                                              onChanged:
+                                                                  (item) =>
+                                                                      setState(
+                                                                        () => credit =
+                                                                            item!,
+                                                                      )),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    const Text(
+                                                      'Year:  ',
+                                                      style: TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 86,
+                                                      child:
+                                                          DropdownButtonFormField(
+                                                              dropdownColor:
+                                                                  ReusableMethods
+                                                                      .colorLight,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              decoration: InputDecoration(
+                                                                  border: OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20),
+                                                                      borderSide: BorderSide(
+                                                                          width:
+                                                                              1,
+                                                                          color: ReusableMethods
+                                                                              .colorDark))),
+                                                              value: year,
+                                                              items: years
+                                                                  .map((item) =>
+                                                                      DropdownMenuItem(
+                                                                        value:
+                                                                            item,
+                                                                        child: Text(
+                                                                            '$item',
+                                                                            style:
+                                                                                const TextStyle(fontSize: 14)),
+                                                                      ))
+                                                                  .toList(),
+                                                              onChanged:
+                                                                  (item) =>
+                                                                      setState(
+                                                                        () => year =
+                                                                            item!,
+                                                                      )),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 20.0),
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    if (name != null &&
+                                                        courseID != null &&
+                                                        deptName != null &&
+                                                        semester !=
+                                                            'Semester') {
+                                                      int? id =
+                                                          await ReusableMethods
+                                                              .getUserId();
+                                                      await createCourse(
+                                                          id!,
+                                                          courseID!,
+                                                          name!,
+                                                          deptName!,
+                                                          credit,
+                                                          semester,
+                                                          year);
+                                                      // ignore: use_build_context_synchronously
+                                                      setState(() {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      });
+                                                      // ignore: use_build_context_synchronously
+                                                      Flushbar(
+                                                        message:
+                                                            "$courseID created successfully",
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                        margin: EdgeInsets.only(
+                                                            // ignore: use_build_context_synchronously
+                                                            bottom: MediaQuery.of(
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
+                                                                20),
+                                                      ).show(context);
+                                                    } else if (name != null &&
+                                                        courseID != null &&
+                                                        deptName != null &&
+                                                        semester ==
+                                                            'Semester') {
+                                                      Flushbar(
+                                                        message:
+                                                            "Please select a semester.",
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                        margin: EdgeInsets.only(
+                                                            bottom: MediaQuery.of(
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
+                                                                20),
+                                                      ).show(context);
+                                                    } else {
+                                                      Flushbar(
+                                                        message:
+                                                            "Please fill all necessary fields.",
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                        margin: EdgeInsets.only(
+                                                            bottom: MediaQuery.of(
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
+                                                                20),
+                                                      ).show(context);
+                                                    }
+                                                  },
+                                                  style: ButtonStyle(
+                                                    shape: MaterialStateProperty
+                                                        .all<
+                                                            RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                      ),
+                                                    ),
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent),
+                                                    // Set overlayColor to Colors.transparent to remove the purple shadow
+                                                    overlayColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent),
+                                                    elevation:
+                                                        MaterialStateProperty
+                                                            .all<double>(0),
+                                                  ),
+                                                  child: Container(
+                                                    width: double.infinity,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            15),
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          ReusableMethods
+                                                              .colorProfile1,
+                                                          ReusableMethods
+                                                              .colorProfile2,
+                                                          ReusableMethods
+                                                              .colorProfile3,
+                                                        ],
+                                                        begin: Alignment
+                                                            .centerLeft,
+                                                        end: Alignment
+                                                            .centerRight,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                    ),
+                                                    child: const Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        'Create',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ), //const SizedBox(height: 10.0),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            })),
+                  ],
+                ),
+              );
+          }
+        },
+      ),
     );
   }
 
-  Widget courseCard(BuildContext context, HomeCourse homeCourse) {
+  Widget courseCard(BuildContext context, String courseID, String courseName) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: Container(
@@ -276,7 +841,7 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: [
                     Text(
-                      homeCourse.courseCode,
+                      courseID,
                       style: const TextStyle(
                         color: Colors.grey,
                       ),
@@ -285,7 +850,7 @@ class _HomePageState extends State<HomePage> {
                       height: 3.0,
                     ),
                     Text(
-                      homeCourse.courseName,
+                      courseName,
                       style: TextStyle(
                         color: ReusableMethods.colorDark,
                         fontSize: 20,
