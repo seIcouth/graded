@@ -20,7 +20,13 @@ class _HomePageState extends State<HomePage> {
   int _index = 0;
 
   late List<dynamic> courses;
-  List<String> semesters = ['Select a semester', 'Fall', 'Winter', 'Spring', 'Summer'];
+  List<String> semesters = [
+    'Select a semester',
+    'Fall',
+    'Winter',
+    'Spring',
+    'Summer'
+  ];
   List<int> years = [
     2020,
     2021,
@@ -47,11 +53,9 @@ class _HomePageState extends State<HomePage> {
   String? studentMail;
   String inviteCourseID = 'Select a course';
 
-  late String role;
-
   Future<List<dynamic>> getCourses() async {
     int? id = await ReusableMethods.getUserId();
-    await getRole();
+    await ReusableMethods.getRole();
 
     // Construct the URL with the instructor ID
     String url =
@@ -66,7 +70,7 @@ class _HomePageState extends State<HomePage> {
       courses = json.decode(response.body);
 
       inviteCourses = ['Select a course'];
-      for(int i=0; i<courses.length; i++){
+      for (int i = 0; i < courses.length; i++) {
         inviteCourses.add(courses[i]['courseID']);
       }
 
@@ -77,34 +81,6 @@ class _HomePageState extends State<HomePage> {
       // If the response is not successful
       print('Failed to get courses. Status code: ${response.statusCode}');
       return [];
-    }
-  }
-
-  Future<void> getRole() async {
-    int? id = await ReusableMethods.getUserId();
-
-    // Construct the URL with the user ID
-    String url = 'http://10.0.2.2/graded/getuserinfo.php?id=$id';
-
-    // Make an HTTP GET request to the PHP script
-    http.Response response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      // If the response is successful (status code 200)
-      // Parse the response body as JSON
-      List<dynamic> userData = json.decode(response.body);
-
-      // Access the user data from the JSON response
-      // assuming the response is an array containing a single user object
-      Map<String, dynamic> user = userData.isNotEmpty ? userData[0] : {};
-
-      // Use the user data as needed
-      role = user['role'] == 'student' ? 'Student' : 'Instructor';
-
-      //print("$name - $surname - $deptName - $role - $mail");
-    } else {
-      // If the response is not successful
-      print('Failed to get user info. Status code: ${response.statusCode}');
     }
   }
 
@@ -148,25 +124,27 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<String> getInviteCourseSemester(String inviteCourseID) async{
-    for(int i=0; i<courses.length; i++){
-      if(courses[i]['courseID'] == inviteCourseID){
+  Future<String> getInviteCourseSemester(String inviteCourseID) async {
+    for (int i = 0; i < courses.length; i++) {
+      if (courses[i]['courseID'] == inviteCourseID) {
         return courses[i]['semester'];
       }
     }
     return '';
   }
-  Future<int> getInviteCourseYear(String inviteCourseID) async{
-    for(int i=0; i<courses.length; i++){
-      if(courses[i]['courseID'] == inviteCourseID){
+
+  Future<int> getInviteCourseYear(String inviteCourseID) async {
+    for (int i = 0; i < courses.length; i++) {
+      if (courses[i]['courseID'] == inviteCourseID) {
         return int.parse(courses[i]['year']);
       }
     }
     return -1;
   }
-  Future<String> getInviteCourseSectionID(String inviteCourseID) async{
-    for(int i=0; i<courses.length; i++){
-      if(courses[i]['courseID'] == inviteCourseID){
+
+  Future<String> getInviteCourseSectionID(String inviteCourseID) async {
+    for (int i = 0; i < courses.length; i++) {
+      if (courses[i]['courseID'] == inviteCourseID) {
         return courses[i]['sectionID'];
       }
     }
@@ -419,7 +397,8 @@ class _HomePageState extends State<HomePage> {
                                 default:
                                   return courses.isEmpty
                                       ? Image.asset(
-                                          role == "Instructor"
+                                          '${ReusableMethods.getRole()}' ==
+                                                  "Instructor"
                                               ? 'assets/images/no_course_inst.png'
                                               : 'assets/images/no_course_std.png',
                                           width: double.infinity,
@@ -451,7 +430,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FutureBuilder(
-        future: getRole(),
+        future: ReusableMethods.getRole(),
         builder: (context, AsyncSnapshot<void> snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -461,7 +440,7 @@ class _HomePageState extends State<HomePage> {
               return const Text("");
             default:
               return Visibility(
-                visible: role == 'Instructor',
+                visible: '${ReusableMethods.getRole()}' == 'Instructor',
                 child: SpeedDial(
                   icon: CupertinoIcons.add,
                   activeIcon: CupertinoIcons.multiply,
@@ -500,7 +479,7 @@ class _HomePageState extends State<HomePage> {
                                                 fontWeight: FontWeight.w800,
                                                 fontSize: 24.0,
                                                 color:
-                                                ReusableMethods.colorDark,
+                                                    ReusableMethods.colorDark,
                                               ),
                                             ),
                                           ),
@@ -515,7 +494,7 @@ class _HomePageState extends State<HomePage> {
                                                     studentMail = value;
                                                   },
                                                   keyboardType:
-                                                  TextInputType.name,
+                                                      TextInputType.name,
                                                   decoration: InputDecoration(
                                                     border: OutlineInputBorder(
                                                       borderSide: BorderSide(
@@ -524,8 +503,8 @@ class _HomePageState extends State<HomePage> {
                                                             .colorDark,
                                                       ),
                                                       borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.0),
+                                                          BorderRadius.circular(
+                                                              20.0),
                                                     ),
                                                     labelText: 'Student Mail',
                                                   ),
@@ -533,17 +512,17 @@ class _HomePageState extends State<HomePage> {
                                                 const SizedBox(height: 15.0),
                                                 DropdownButtonFormField(
                                                     dropdownColor:
-                                                    ReusableMethods
-                                                        .colorLight,
+                                                        ReusableMethods
+                                                            .colorLight,
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        20),
+                                                        BorderRadius.circular(
+                                                            20),
                                                     decoration: InputDecoration(
                                                         border: OutlineInputBorder(
                                                             borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                20),
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
                                                             borderSide: BorderSide(
                                                                 width: 1,
                                                                 color: ReusableMethods
@@ -551,19 +530,19 @@ class _HomePageState extends State<HomePage> {
                                                     value: inviteCourseID,
                                                     items: inviteCourses
                                                         .map((item) =>
-                                                        DropdownMenuItem(
-                                                          value: item,
-                                                          child: Text(
-                                                              '$item',
-                                                              style: const TextStyle(
-                                                                  fontSize:
-                                                                  16)),
-                                                        ))
+                                                            DropdownMenuItem(
+                                                              value: item,
+                                                              child: Text(
+                                                                  '$item',
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          16)),
+                                                            ))
                                                         .toList(),
                                                     onChanged: (item) =>
                                                         setState(
-                                                              () =>
-                                                          inviteCourseID = item!,
+                                                          () => inviteCourseID =
+                                                              item!,
                                                         )),
                                                 const SizedBox(height: 20.0),
                                                 ElevatedButton(
@@ -571,21 +550,30 @@ class _HomePageState extends State<HomePage> {
                                                     if (studentMail != null &&
                                                         inviteCourseID !=
                                                             'Select a course') {
-                                                      if(ReusableMethods.isValidEmail(studentMail!)){
+                                                      if (ReusableMethods
+                                                          .isValidEmail(
+                                                              studentMail!)) {
                                                         int? id =
-                                                        await ReusableMethods
-                                                            .getUserId();
-                                                        String inviteCourseSemester = await getInviteCourseSemester(inviteCourseID);
-                                                        int inviteCourseYear = await getInviteCourseYear(inviteCourseID);
-                                                        String inviteCourseSectionID = await getInviteCourseSectionID(inviteCourseID);
+                                                            await ReusableMethods
+                                                                .getUserId();
+                                                        String
+                                                            inviteCourseSemester =
+                                                            await getInviteCourseSemester(
+                                                                inviteCourseID);
+                                                        int inviteCourseYear =
+                                                            await getInviteCourseYear(
+                                                                inviteCourseID);
+                                                        String
+                                                            inviteCourseSectionID =
+                                                            await getInviteCourseSectionID(
+                                                                inviteCourseID);
                                                         await sendInvite(
                                                             id!,
                                                             studentMail!,
                                                             inviteCourseID,
                                                             inviteCourseSectionID,
                                                             inviteCourseSemester,
-                                                            inviteCourseYear
-                                                        );
+                                                            inviteCourseYear);
                                                         // ignore: use_build_context_synchronously
                                                         setState(() {
                                                           Navigator.of(context)
@@ -594,48 +582,51 @@ class _HomePageState extends State<HomePage> {
                                                         // ignore: use_build_context_synchronously
                                                         Flushbar(
                                                           message:
-                                                          "Invite sent to $studentMail for $inviteCourseID",
+                                                              "Invite sent to $studentMail for $inviteCourseID",
                                                           duration:
-                                                          const Duration(
-                                                              seconds: 3),
-                                                          margin: EdgeInsets.only(
-                                                            // ignore: use_build_context_synchronously
-                                                              bottom: MediaQuery.of(
-                                                                  context)
-                                                                  .viewInsets
-                                                                  .bottom +
-                                                                  20),
+                                                              const Duration(
+                                                                  seconds: 3),
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  // ignore: use_build_context_synchronously
+                                                                  bottom: MediaQuery.of(
+                                                                              context)
+                                                                          .viewInsets
+                                                                          .bottom +
+                                                                      20),
                                                         ).show(context);
-                                                      } else{
+                                                      } else {
                                                         Flushbar(
                                                           message:
-                                                          "Student mail is badly formatted.",
+                                                              "Student mail is badly formatted.",
                                                           duration:
-                                                          const Duration(
-                                                              seconds: 3),
-                                                          margin: EdgeInsets.only(
-                                                            // ignore: use_build_context_synchronously
-                                                              bottom: MediaQuery.of(
-                                                                  context)
-                                                                  .viewInsets
-                                                                  .bottom +
-                                                                  20),
+                                                              const Duration(
+                                                                  seconds: 3),
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  // ignore: use_build_context_synchronously
+                                                                  bottom: MediaQuery.of(
+                                                                              context)
+                                                                          .viewInsets
+                                                                          .bottom +
+                                                                      20),
                                                         ).show(context);
                                                       }
-                                                    } else if (studentMail != null &&
+                                                    } else if (studentMail !=
+                                                            null &&
                                                         inviteCourseID ==
                                                             'Select a course') {
                                                       Flushbar(
                                                         message:
-                                                        "Please select a course.",
+                                                            "Please select a course.",
                                                         duration:
-                                                        const Duration(
-                                                            seconds: 3),
+                                                            const Duration(
+                                                                seconds: 3),
                                                         margin: EdgeInsets.only(
                                                             bottom: MediaQuery.of(
-                                                                context)
-                                                                .viewInsets
-                                                                .bottom +
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
                                                                 20),
                                                       ).show(context);
                                                     }
@@ -643,31 +634,31 @@ class _HomePageState extends State<HomePage> {
                                                   style: ButtonStyle(
                                                     shape: MaterialStateProperty
                                                         .all<
-                                                        RoundedRectangleBorder>(
+                                                            RoundedRectangleBorder>(
                                                       RoundedRectangleBorder(
                                                         borderRadius:
-                                                        BorderRadius
-                                                            .circular(20.0),
+                                                            BorderRadius
+                                                                .circular(20.0),
                                                       ),
                                                     ),
                                                     backgroundColor:
-                                                    MaterialStateProperty
-                                                        .all<Color>(Colors
-                                                        .transparent),
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent),
                                                     // Set overlayColor to Colors.transparent to remove the purple shadow
                                                     overlayColor:
-                                                    MaterialStateProperty
-                                                        .all<Color>(Colors
-                                                        .transparent),
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent),
                                                     elevation:
-                                                    MaterialStateProperty
-                                                        .all<double>(0),
+                                                        MaterialStateProperty
+                                                            .all<double>(0),
                                                   ),
                                                   child: Container(
                                                     width: double.infinity,
                                                     padding:
-                                                    const EdgeInsets.all(
-                                                        15),
+                                                        const EdgeInsets.all(
+                                                            15),
                                                     decoration: BoxDecoration(
                                                       gradient: LinearGradient(
                                                         colors: [
@@ -684,18 +675,18 @@ class _HomePageState extends State<HomePage> {
                                                             .centerRight,
                                                       ),
                                                       borderRadius:
-                                                      BorderRadius.circular(
-                                                          20.0),
+                                                          BorderRadius.circular(
+                                                              20.0),
                                                     ),
                                                     child: const Align(
                                                       alignment:
-                                                      Alignment.center,
+                                                          Alignment.center,
                                                       child: Text(
                                                         'Invite',
                                                         style: TextStyle(
                                                           color: Colors.white,
                                                           fontWeight:
-                                                          FontWeight.bold,
+                                                              FontWeight.bold,
                                                           fontSize: 18,
                                                         ),
                                                       ),
@@ -711,9 +702,7 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                               );
-                            }
-                        )
-                    ),
+                            })),
                     SpeedDialChild(
                         child: Icon(
                           Icons.library_add_outlined,
@@ -841,8 +830,7 @@ class _HomePageState extends State<HomePage> {
                                                         .map((item) =>
                                                             DropdownMenuItem(
                                                               value: item,
-                                                              child: Text(
-                                                                  item,
+                                                              child: Text(item,
                                                                   style: const TextStyle(
                                                                       fontSize:
                                                                           16)),
@@ -1098,9 +1086,7 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                               );
-                            }
-                            )
-                    ),
+                            })),
                   ],
                 ),
               );
@@ -1133,9 +1119,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        //elevation: 6,
-        //shadowColor: ReusableMethods.colorDark,
-        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
