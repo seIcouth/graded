@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:graded/resources/reusable_methods.dart';
 import 'package:graded/screens/auth_screens/login.dart';
 import 'package:graded/screens/homepage.dart';
 import 'package:graded/screens/invitations_page.dart';
 import 'package:graded/screens/profile_page.dart';
+import 'package:http/http.dart' as http;
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
 
 class HiddenDrawer extends StatefulWidget {
@@ -14,8 +16,42 @@ class HiddenDrawer extends StatefulWidget {
 }
 
 class _HiddenDrawerState extends State<HiddenDrawer> {
+
   List<ScreenHiddenDrawer> _pagesStudent = [];
   List<ScreenHiddenDrawer> _pagesInstructor = [];
+
+  late String role;
+
+  Future<String> getRole() async {
+    int? id = await ReusableMethods.getUserId();
+
+    // Construct the URL with the user ID
+    String url = 'http://10.0.2.2/graded/getuserinfo.php?id=$id';
+
+    // Make an HTTP GET request to the PHP script
+    http.Response response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // If the response is successful (status code 200)
+      // Parse the response body as JSON
+      List<dynamic> userData = json.decode(response.body);
+
+      // Access the user data from the JSON response
+      // assuming the response is an array containing a single user object
+      Map<String, dynamic> user = userData.isNotEmpty ? userData[0] : {};
+
+      // Use the user data as needed
+      role = user['role'] == 'student' ? 'Student' : 'Instructor';
+
+      return role;
+      //print("$name - $surname - $deptName - $role - $mail");
+    } else {
+      // If the response is not successful
+      print('Failed to get user info. Status code: ${response.statusCode}');
+      return '-1';
+
+    }
+  }
 
   @override
   void initState() {
@@ -112,7 +148,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: ReusableMethods.getRole(),
+      future: getRole(),
       builder: (context, AsyncSnapshot<String> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');

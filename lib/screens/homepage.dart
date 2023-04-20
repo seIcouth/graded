@@ -17,31 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _index = 0;
 
-  late List<dynamic> courses;
-  List<String> semesters = [
-    'Select a semester',
-    'Fall',
-    'Winter',
-    'Spring',
-    'Summer'
-  ];
-  List<int> years = [
-    2020,
-    2021,
-    2022,
-    2023,
-    2024,
-    2025,
-    2026,
-    2027,
-    2028,
-    2029,
-    2030
-  ];
-  List<int> credits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  List<String> inviteCourses = ['Select a course'];
+  // variables
+  int _index = 0;
 
   late int instructorID;
   String? courseID;
@@ -53,12 +31,55 @@ class _HomePageState extends State<HomePage> {
   String? studentMail;
   String inviteCourseID = 'Select a course';
 
+  late String role;
+
+  late List<dynamic> courses;
+  List<String> inviteCourses = ['Select a course'];
+
+  // lists for dropdown buttons
+  List<String> semesters = ['Select a semester', 'Fall', 'Winter', 'Spring', 'Summer'];
+  List<int> years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
+  List<int> credits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+
+
+  // accessor methods
+  Future<String> getRole() async {
+    int? id = await ReusableMethods.getUserId();
+
+    // Construct the URL with the user ID
+    String url = 'http://10.0.2.2/graded/getuserinfo.php?id=$id';
+
+    // Make an HTTP GET request to the PHP script
+    http.Response response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // If the response is successful (status code 200)
+      // Parse the response body as JSON
+      List<dynamic> userData = json.decode(response.body);
+
+      // Access the user data from the JSON response
+      // assuming the response is an array containing a single user object
+      Map<String, dynamic> user = userData.isNotEmpty ? userData[0] : {};
+
+      // Use the user data as needed
+      role = user['role'] == 'student' ? 'Student' : 'Instructor';
+
+      return role;
+      //print("$name - $surname - $deptName - $role - $mail");
+    } else {
+      // If the response is not successful
+      print('Failed to get user info. Status code: ${response.statusCode}');
+      return '-1';
+    }
+  }
+
   Future<List<dynamic>> getCourses() async {
     int? id = await ReusableMethods.getUserId();
-    await ReusableMethods.getRole();
+    await getRole();
 
     // Construct the URL with the instructor ID
-    String url =
+    String url = role == 'Student' ? 'http://10.0.2.2/graded/getcoursesbystudentid.php?studentID=$id':
         'http://10.0.2.2/graded/getcoursesbyinstructorid.php?instructorID=$id';
 
     // Make an HTTP GET request to the PHP script
@@ -81,46 +102,6 @@ class _HomePageState extends State<HomePage> {
       // If the response is not successful
       print('Failed to get courses. Status code: ${response.statusCode}');
       return [];
-    }
-  }
-
-  Future<void> createCourse(
-      int parInstructorID,
-      String parCourseID,
-      String parName,
-      String parDeptName,
-      int parCredit,
-      String parSemester,
-      int parYear) async {
-    try {
-      // Prepare the request body as a Map
-      final requestBody = {
-        'instructorID': parInstructorID.toString(), // Convert to String
-        'courseID': parCourseID,
-        'name': parName,
-        'deptName': parDeptName,
-        'credit': parCredit.toString(), // Convert to String
-        'sectionID': '1',
-        'semester': parSemester,
-        'year': parYear.toString(), // Convert to String
-      };
-
-      // Send a POST request to the createcourse.php file on server
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2/graded/createcourse.php'),
-        body: requestBody,
-      );
-
-      if (response.statusCode == 200) {
-        // Course created successfully
-        print('Course created successfully');
-      } else {
-        // Handle any errors from the server
-        print('Failed to create course: ${response.body}');
-      }
-    } catch (e) {
-      // Handle any errors locally
-      print('Failed to create course: $e');
     }
   }
 
@@ -149,6 +130,47 @@ class _HomePageState extends State<HomePage> {
       }
     }
     return '';
+  }
+
+  // manipulation methods
+  Future<void> createCourse(
+      int parInstructorID,
+      String parCourseID,
+      String parName,
+      String parDeptName,
+      int parCredit,
+      String parSemester,
+      int parYear) async {
+    try {
+      // Prepare the request body as a Map
+      final requestBody = {
+        'instructorID': parInstructorID.toString(), // Convert to String
+        'courseID': parCourseID,
+        'name': parName,
+        'deptName': parDeptName,
+        'credit': parCredit.toString(), // Convert to String
+        'sectionID': '1',
+        'semester': parSemester,
+        'year': parYear.toString(), // Convert to String
+      };
+
+      // Send a POST request to the related file on server
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2/graded/createcourse.php'),
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        // Course created successfully
+        print('Course created successfully');
+      } else {
+        // Handle any errors from the server
+        print('Failed to create course: ${response.body}');
+      }
+    } catch (e) {
+      // Handle any errors locally
+      print('Failed to create course: $e');
+    }
   }
 
   Future<void> sendInvite(
@@ -191,6 +213,8 @@ class _HomePageState extends State<HomePage> {
   static String formatDate(DateTime date) =>
       DateFormat("MMMM d - hh:mm").format(date);
 
+
+  // dummy list (will change)
   List<Widget> dummyNotifications = [];
   List<N.Notification> recentNotifications = [
     N.AnnouncementNotification(
@@ -397,7 +421,7 @@ class _HomePageState extends State<HomePage> {
                                 default:
                                   return courses.isEmpty
                                       ? Image.asset(
-                                          '${ReusableMethods.getRole()}' ==
+                                          role ==
                                                   "Instructor"
                                               ? 'assets/images/no_course_inst.png'
                                               : 'assets/images/no_course_std.png',
@@ -430,8 +454,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FutureBuilder(
-        future: ReusableMethods.getRole(),
-        builder: (context, AsyncSnapshot<void> snapshot) {
+        future: getRole(),
+        builder: (context, AsyncSnapshot<String> snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           }
@@ -440,7 +464,7 @@ class _HomePageState extends State<HomePage> {
               return const Text("");
             default:
               return Visibility(
-                visible: '${ReusableMethods.getRole()}' == 'Instructor',
+                visible: snapshot.data == 'Instructor',
                 child: SpeedDial(
                   icon: CupertinoIcons.add,
                   activeIcon: CupertinoIcons.multiply,
@@ -533,7 +557,7 @@ class _HomePageState extends State<HomePage> {
                                                             DropdownMenuItem(
                                                               value: item,
                                                               child: Text(
-                                                                  '$item',
+                                                                  item,
                                                                   style: const TextStyle(
                                                                       fontSize:
                                                                           16)),
@@ -692,7 +716,8 @@ class _HomePageState extends State<HomePage> {
                                                       ),
                                                     ),
                                                   ),
-                                                ), //const SizedBox(height: 10.0),
+                                                ),
+                                                //const SizedBox(height: 10.0),
                                               ],
                                             ),
                                           ),
@@ -1076,7 +1101,8 @@ class _HomePageState extends State<HomePage> {
                                                       ),
                                                     ),
                                                   ),
-                                                ), //const SizedBox(height: 10.0),
+                                                ),
+                                                //const SizedBox(height: 10.0),
                                               ],
                                             ),
                                           ),
@@ -1152,10 +1178,14 @@ class _HomePageState extends State<HomePage> {
                       height: 10.0,
                     ),
                     const Divider(
-                      color: Colors.grey, //color of divider
-                      height: 5, //height spacing of divider
-                      thickness: 2.0, //thickness of divider line
-                      indent: 5, //spacing at the start of divider
+                      color: Colors.grey,
+                      //color of divider
+                      height: 5,
+                      //height spacing of divider
+                      thickness: 2.0,
+                      //thickness of divider line
+                      indent: 5,
+                      //spacing at the start of divider
                       endIndent: 5, //spacing at the end of divider
                     ),
                     Row(
@@ -1259,10 +1289,14 @@ class _HomePageState extends State<HomePage> {
                             height: 10.0,
                           ),
                           const Divider(
-                            color: Colors.grey, //color of divider
-                            height: 5, //height spacing of divider
-                            thickness: 1.5, //thickness of divider line
-                            indent: 5, //spacing at the start of divider
+                            color: Colors.grey,
+                            //color of divider
+                            height: 5,
+                            //height spacing of divider
+                            thickness: 1.5,
+                            //thickness of divider line
+                            indent: 5,
+                            //spacing at the start of divider
                             endIndent: 5, //spacing at the end of divider
                           ),
                           const SizedBox(
@@ -1366,10 +1400,14 @@ class _HomePageState extends State<HomePage> {
                             height: 10.0,
                           ),
                           const Divider(
-                            color: Colors.grey, //color of divider
-                            height: 5, //height spacing of divider
-                            thickness: 1.5, //thickness of divider line
-                            indent: 5, //spacing at the start of divider
+                            color: Colors.grey,
+                            //color of divider
+                            height: 5,
+                            //height spacing of divider
+                            thickness: 1.5,
+                            //thickness of divider line
+                            indent: 5,
+                            //spacing at the start of divider
                             endIndent: 5, //spacing at the end of divider
                           ),
                           const SizedBox(
