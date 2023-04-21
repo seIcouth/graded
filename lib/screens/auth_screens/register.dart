@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,14 +38,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<String> register() async {
-    final response = await http.post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
+    final response = await http
+        .post(Uri.parse("http://10.0.2.2/graded/register.php"), body: {
       "mail": mailController.text,
       "password": passwordController.text,
       "role": isStudent ? "student" : "instructor",
       "name": nameController.text,
       "surname": surnameController.text,
       "deptName": deptName.text,
-      "addToInstructor": isStudent ? "0" : "1", // Add this parameter to indicate if the user should be added to the instructor table
+      "addToInstructor": isStudent
+          ? "0"
+          : "1", // Add this parameter to indicate if the user should be added to the instructor table
     });
 
     List<dynamic> datauser = json.decode(response.body);
@@ -206,48 +211,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(
                     height: 14,
                   ),
-                  TextField(
-                    cursorHeight: 16,
-                    cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(12),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: TextField(
+                          cursorHeight: 16,
+                          cursorWidth: 1.5,
+                          cursorColor: ReusableMethods.colorDark,
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: ReusableMethods.colorDark),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            hintText: 'Name',
+                            fillColor: Colors.grey[100],
+                            filled: true,
+                          ),
+                        ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(
+                        width: 8.0,
                       ),
-                      hintText: 'Name',
-                      fillColor: Colors.grey[100],
-                      filled: true,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 14,
-                  ),
-                  TextField(
-                    cursorHeight: 16,
-                    cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
-                    controller: surnameController,
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(12),
+                      Flexible(
+                        child: TextField(
+                          cursorHeight: 16,
+                          cursorWidth: 1.5,
+                          cursorColor: ReusableMethods.colorDark,
+                          controller: surnameController,
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: ReusableMethods.colorDark),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            hintText: 'Surname',
+                            fillColor: Colors.grey[100],
+                            filled: true,
+                          ),
+                        ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      hintText: 'Surname',
-                      fillColor: Colors.grey[100],
-                      filled: true,
-                    ),
+                    ],
                   ),
                   const SizedBox(
                     height: 14,
@@ -381,6 +394,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             if (passwordController.text.length > 5) {
                               try {
                                 await register();
+                                // ignore: use_build_context_synchronously
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => const HiddenDrawer(),
@@ -451,7 +465,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacement(
+                          Navigator.pop(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const LoginPage()),

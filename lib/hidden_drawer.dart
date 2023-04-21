@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:graded/resources/reusable_methods.dart';
@@ -16,7 +18,6 @@ class HiddenDrawer extends StatefulWidget {
 }
 
 class _HiddenDrawerState extends State<HiddenDrawer> {
-
   List<ScreenHiddenDrawer> _pagesStudent = [];
   List<ScreenHiddenDrawer> _pagesInstructor = [];
 
@@ -49,7 +50,6 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
       // If the response is not successful
       print('Failed to get user info. Status code: ${response.statusCode}');
       return '-1';
-
     }
   }
 

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
@@ -57,6 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void logout() async {
     await ReusableMethods.setLoggedInFalse();
+    // ignore: use_build_context_synchronously
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const LoginPage(),

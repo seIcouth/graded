@@ -1,10 +1,12 @@
+// ignore_for_file: avoid_print
 import 'dart:convert';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:graded/models/home_notification.dart' as N;
+import 'package:graded/models/home_notification.dart' as ntf;
 import 'package:graded/resources/reusable_methods.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -17,10 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   // variables
-  int _index = 0;
-
   late int instructorID;
   String? courseID;
   String? name;
@@ -37,11 +36,27 @@ class _HomePageState extends State<HomePage> {
   List<String> inviteCourses = ['Select a course'];
 
   // lists for dropdown buttons
-  List<String> semesters = ['Select a semester', 'Fall', 'Winter', 'Spring', 'Summer'];
-  List<int> years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
+  List<String> semesters = [
+    'Select a semester',
+    'Fall',
+    'Winter',
+    'Spring',
+    'Summer'
+  ];
+  List<int> years = [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ];
   List<int> credits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-
 
   // accessor methods
   Future<String> getRole() async {
@@ -79,8 +94,9 @@ class _HomePageState extends State<HomePage> {
     await getRole();
 
     // Construct the URL with the instructor ID
-    String url = role == 'Student' ? 'http://10.0.2.2/graded/getcoursesbystudentid.php?studentID=$id':
-        'http://10.0.2.2/graded/getcoursesbyinstructorid.php?instructorID=$id';
+    String url = role == 'Student'
+        ? 'http://10.0.2.2/graded/getcoursesbystudentid.php?studentID=$id'
+        : 'http://10.0.2.2/graded/getcoursesbyinstructorid.php?instructorID=$id';
 
     // Make an HTTP GET request to the PHP script
     http.Response response = await http.get(Uri.parse(url));
@@ -213,38 +229,37 @@ class _HomePageState extends State<HomePage> {
   static String formatDate(DateTime date) =>
       DateFormat("MMMM d - hh:mm").format(date);
 
-
   // dummy list (will change)
   List<Widget> dummyNotifications = [];
-  List<N.Notification> recentNotifications = [
-    N.AnnouncementNotification(
+  List<ntf.Notification> recentNotifications = [
+    ntf.AnnouncementNotification(
       title: "First Lecture",
       content:
           "Hello everyone, we will start the lectures on Monday. Lectures will be held on F0D11. See you at the class.",
       courseCode: "COMP101",
       courseName: "Art of Computing",
     ),
-    N.AssignmentNotification(
+    ntf.AssignmentNotification(
         title: "First Lecture",
         content:
             "You're expected to implement a java method that finds whether a given number is a prime number or not.",
         courseCode: "COMP101",
         courseName: "Art of Computing",
         dueDate: formatDate(DateTime.now())),
-    N.AnnouncementNotification(
+    ntf.AnnouncementNotification(
         title: "Hyflex Lectures",
         content:
             "We will have hyflex lectures during this semester according to YOK's new regulations. Get prepared.",
         courseCode: "MATH151",
         courseName: "Calculus I"),
-    N.AnnouncementNotification(
+    ntf.AnnouncementNotification(
       title: "About Week-1",
       content:
           "Read the discussions and try to answer the question before the lecture. Also, don't forget to watch the recorded videos.",
       courseCode: "TURK101",
       courseName: "Turkish I",
     ),
-    N.AnnouncementNotification(
+    ntf.AnnouncementNotification(
       title: "First Quiz",
       content:
           "We will have our first quiz on monday, second lecture. Good luck.",
@@ -256,14 +271,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     for (int i = 0; i < recentNotifications.length; i++) {
-      if (recentNotifications[i] is N.AssignmentNotification) {
-        N.AssignmentNotification s =
-            recentNotifications[i] as N.AssignmentNotification;
+      if (recentNotifications[i] is ntf.AssignmentNotification) {
+        ntf.AssignmentNotification s =
+            recentNotifications[i] as ntf.AssignmentNotification;
         dummyNotifications.add(assignmentNotificationCard(context, s.title,
             s.content, s.courseCode, s.courseName, s.dueDate));
       } else {
-        N.AnnouncementNotification n =
-            recentNotifications[i] as N.AnnouncementNotification;
+        ntf.AnnouncementNotification n =
+            recentNotifications[i] as ntf.AnnouncementNotification;
         dummyNotifications.add(announcementNotificationCard(
             context, n.title, n.content, n.courseCode, n.courseName));
       }
@@ -341,20 +356,15 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 170, // card height
-                            child: PageView.builder(
-                              itemCount: 5,
-                              controller: PageController(viewportFraction: 0.7),
-                              onPageChanged: (int index) =>
-                                  setState(() => _index = index),
-                              itemBuilder: (_, i) {
-                                return Transform.scale(
-                                  scale: i == _index ? 1 : 0.85,
-                                  child: dummyNotifications[i],
-                                );
-                              },
+                          CarouselSlider(
+                            options: CarouselOptions(
+                              autoPlay: true,
+                              aspectRatio: 2.2,
+                              enlargeCenterPage: true,
+                              enableInfiniteScroll: false,
+                              initialPage: 0,
                             ),
+                            items: dummyNotifications,
                           ),
                         ],
                       ),
@@ -421,8 +431,7 @@ class _HomePageState extends State<HomePage> {
                                 default:
                                   return courses.isEmpty
                                       ? Image.asset(
-                                          role ==
-                                                  "Instructor"
+                                          role == "Instructor"
                                               ? 'assets/images/no_course_inst.png'
                                               : 'assets/images/no_course_std.png',
                                           width: double.infinity,
@@ -556,8 +565,7 @@ class _HomePageState extends State<HomePage> {
                                                         .map((item) =>
                                                             DropdownMenuItem(
                                                               value: item,
-                                                              child: Text(
-                                                                  item,
+                                                              child: Text(item,
                                                                   style: const TextStyle(
                                                                       fontSize:
                                                                           16)),

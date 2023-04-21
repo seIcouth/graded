@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.18.0
   flutter_speed_dial: ^6.2.0
   simple_gradient_text: ^1.2.4
+  carousel_slider: ^4.2.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.12.0

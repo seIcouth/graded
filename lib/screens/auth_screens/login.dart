@@ -29,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
         int id = int.parse(datauser[0]['id']);
         ReusableMethods.setUserId(id);
         ReusableMethods.setLoggedInTrue();
+        // ignore: use_build_context_synchronously
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => const HiddenDrawer(),
@@ -38,6 +39,7 @@ class _LoginPageState extends State<LoginPage> {
         int id = int.parse(datauser[0]['id']);
         ReusableMethods.setUserId(id);
         ReusableMethods.setLoggedInTrue();
+        // ignore: use_build_context_synchronously
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => const HiddenDrawer(),
@@ -68,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Image.asset('assets/images/logo_straight.png'),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 30.0),
+                  padding: const EdgeInsets.only(left: 30.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -97,7 +99,8 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
@@ -123,7 +126,8 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: ReusableMethods.colorDark),
+                        borderSide:
+                            BorderSide(color: ReusableMethods.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Password',
@@ -172,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                         if (ReusableMethods.isValidEmail(mail.text)) {
                           try {
                             await login();
-                          } on FormatException catch (e) {
+                          } on FormatException {
                             Flushbar(
                               message:
                                   "Something went wrong, please try again.",
