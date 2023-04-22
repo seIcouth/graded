@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:graded/screens/people_page.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:graded/models/home_notification.dart' as ntf;
@@ -359,7 +360,7 @@ class _HomePageState extends State<HomePage> {
                           CarouselSlider(
                             options: CarouselOptions(
                               autoPlay: true,
-                              aspectRatio: 2.2,
+                              aspectRatio: 2.1,
                               enlargeCenterPage: true,
                               enableInfiniteScroll: false,
                               initialPage: 0,
@@ -444,9 +445,13 @@ class _HomePageState extends State<HomePage> {
                                           itemCount: courses.length,
                                           itemBuilder: (context, i) {
                                             return courseCard(
-                                                context,
-                                                courses[i]['courseID'],
-                                                courses[i]['name']);
+                                              context,
+                                              courses[i]['courseID'],
+                                              courses[i]['name'],
+                                              courses[i]['sectionID'],
+                                              courses[i]['semester'],
+                                              courses[i]['year'],
+                                            );
                                           },
                                         );
                               }
@@ -1130,7 +1135,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget courseCard(BuildContext context, String courseID, String courseName) {
+  Widget courseCard(BuildContext context, String courseID, String courseName, String sectionID, String semester, String year) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: Container(
@@ -1216,7 +1221,13 @@ class _HomePageState extends State<HomePage> {
                           tooltip: "assignments",
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PeoplePage(courseID: courseID, sectionID: sectionID, semester: semester, year: year,),
+                              ),
+                            );
+                          },
                           icon: Icon(
                             CupertinoIcons.person_2_fill,
                             color: ReusableMethods.colorPeople,

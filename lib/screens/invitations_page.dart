@@ -152,7 +152,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Center(
               child: Builder(builder: (context) {
                 return FutureBuilder(
@@ -213,443 +213,439 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                         child: Container(
                                           margin: const EdgeInsets.all(8.0),
                                           width: double.infinity,
-                                          child: Stack(
+                                          child: Column(
                                             children: [
-                                              Column(
-                                                children: [
-                                                  Text(
-                                                    invitations[index]
-                                                        ['courseID'],
-                                                    style: const TextStyle(
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 3.0,
-                                                  ),
-                                                  GradientText(
-                                                    invitations[index]
-                                                        ['courseName'],
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w900,
-                                                    ),
-                                                    colors: [
-                                                      ReusableMethods
-                                                          .colorProfile1,
-                                                      ReusableMethods
-                                                          .colorProfile2,
-                                                      ReusableMethods
-                                                          .colorProfile3,
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10.0,
-                                                  ),
-                                                  const Divider(
-                                                    color: Colors
-                                                        .grey, //color of divider
-                                                    height:
-                                                        5, //height spacing of divider
-                                                    thickness:
-                                                        2.0, //thickness of divider line
-                                                    indent:
-                                                        5, //spacing at the start of divider
-                                                    endIndent:
-                                                        5, //spacing at the end of divider
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10.0,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 16.0),
-                                                    child: Column(
+                                              Text(
+                                                invitations[index]
+                                                    ['courseID'],
+                                                style: const TextStyle(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 3.0,
+                                              ),
+                                              GradientText(
+                                                invitations[index]
+                                                    ['courseName'],
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight:
+                                                      FontWeight.w900,
+                                                ),
+                                                colors: [
+                                                  ReusableMethods
+                                                      .colorProfile1,
+                                                  ReusableMethods
+                                                      .colorProfile2,
+                                                  ReusableMethods
+                                                      .colorProfile3,
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              const Divider(
+                                                color: Colors
+                                                    .grey, //color of divider
+                                                height:
+                                                    5, //height spacing of divider
+                                                thickness:
+                                                    2.0, //thickness of divider line
+                                                indent:
+                                                    5, //spacing at the start of divider
+                                                endIndent:
+                                                    5, //spacing at the end of divider
+                                              ),
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets
+                                                        .symmetric(
+                                                    horizontal: 16.0),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
                                                       children: [
-                                                        Row(
-                                                          children: [
-                                                            Text('Instructor:',
-                                                                style:
-                                                                    textStyleKey),
-                                                            const Spacer(),
-                                                            Text(
-                                                                '${invitations[index]['instructorName']} ${invitations[index]['surname']}',
-                                                                style:
-                                                                    textStyleValue),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10.0,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Department:',
-                                                              style:
-                                                                  textStyleKey,
-                                                            ),
-                                                            const Spacer(),
-                                                            Text(
-                                                                invitations[
-                                                                        index][
-                                                                    'deptName'],
-                                                                style:
-                                                                    textStyleValue),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10.0,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Credits:',
-                                                              style:
-                                                                  textStyleKey,
-                                                            ),
-                                                            const Spacer(),
-                                                            Text(
-                                                                invitations[
-                                                                        index]
-                                                                    ['credit'],
-                                                                style:
-                                                                    textStyleValue),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10.0,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Semester:',
-                                                              style:
-                                                                  textStyleKey,
-                                                            ),
-                                                            const Spacer(),
-                                                            Text(
-                                                                invitations[
-                                                                        index][
-                                                                    'semester'],
-                                                                style:
-                                                                    textStyleValue),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10.0,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              'Year:',
-                                                              style:
-                                                                  textStyleKey,
-                                                            ),
-                                                            const Spacer(),
-                                                            Text(
-                                                                invitations[
-                                                                        index]
-                                                                    ['year'],
-                                                                style:
-                                                                    textStyleValue),
-                                                          ],
-                                                        ),
+                                                        Text('Instructor:',
+                                                            style:
+                                                                textStyleKey),
+                                                        const Spacer(),
+                                                        Text(
+                                                            '${invitations[index]['instructorName']} ${invitations[index]['surname']}',
+                                                            style:
+                                                                textStyleValue),
                                                       ],
                                                     ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 16.0,
-                                                  ),
-                                                  Visibility(
-                                                    visible: invitations[index]
-                                                            ['status'] ==
-                                                        '0',
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
+                                                    const SizedBox(
+                                                      height: 10.0,
+                                                    ),
+                                                    Row(
                                                       children: [
-                                                        ElevatedButton.icon(
-                                                            //Handle button press event
-                                                            onPressed:
-                                                                () async {
-                                                              int parInstructorID =
-                                                                  int.parse(invitations[
-                                                                          index]
-                                                                      [
-                                                                      'instructorID']);
-                                                              int?
-                                                                  parStudentID =
-                                                                  await ReusableMethods
-                                                                      .getUserId();
-                                                              String
-                                                                  parCourseID =
-                                                                  invitations[
-                                                                          index]
-                                                                      [
-                                                                      'courseID'];
-                                                              String
-                                                                  parSectionID =
-                                                                  invitations[
-                                                                          index]
-                                                                      [
-                                                                      'sectionID'];
-                                                              String
-                                                                  parSemester =
-                                                                  invitations[
-                                                                          index]
-                                                                      [
-                                                                      'semester'];
-                                                              int parYear = int
-                                                                  .parse(invitations[
-                                                                          index]
-                                                                      ['year']);
-                                                              int parStatus =
-                                                                  -1;
-                                                              await updateInvites(
-                                                                  parInstructorID,
-                                                                  parStudentID!,
-                                                                  parCourseID,
-                                                                  parSectionID,
-                                                                  parSemester,
-                                                                  parYear,
-                                                                  parStatus);
-                                                              setState(() {});
-                                                            },
-                                                            //Contents of the button
+                                                        Text(
+                                                          'Department:',
+                                                          style:
+                                                              textStyleKey,
+                                                        ),
+                                                        const Spacer(),
+                                                        Text(
+                                                            invitations[
+                                                                    index][
+                                                                'deptName'],
                                                             style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              35.0)),
-                                                              side: const BorderSide(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  width: 1.0,
-                                                                  style:
-                                                                      BorderStyle
-                                                                          .solid),
-                                                              //Change font size
-                                                              textStyle:
-                                                                  const TextStyle(
-                                                                fontSize: 18,
-                                                              ),
-                                                              //Set the background color
-                                                              backgroundColor:
-                                                                  ReusableMethods
-                                                                      .colorLight,
-                                                              //Set the foreground (text + icon) color
-                                                              foregroundColor:
-                                                                  Colors.red,
-                                                              //Set the padding on all sides to 30px
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .all(
-                                                                      16.0),
-                                                            ),
-                                                            icon: const Icon(
-                                                                CupertinoIcons
-                                                                    .multiply_circle_fill), //Button icon
-                                                            label: const Text(
-                                                              " Reject ",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )),
-                                                        ElevatedButton.icon(
-                                                            //Handle button press event
-                                                            onPressed:
-                                                                () async {
-                                                              int parInstructorID =
-                                                                  int.parse(invitations[
-                                                                          index]
-                                                                      [
-                                                                      'instructorID']);
-                                                              int?
-                                                                  parStudentID =
-                                                                  await ReusableMethods
-                                                                      .getUserId();
-                                                              String
-                                                                  parCourseID =
-                                                                  invitations[
-                                                                          index]
-                                                                      [
-                                                                      'courseID'];
-                                                              String
-                                                                  parSectionID =
-                                                                  invitations[
-                                                                          index]
-                                                                      [
-                                                                      'sectionID'];
-                                                              String
-                                                                  parSemester =
-                                                                  invitations[
-                                                                          index]
-                                                                      [
-                                                                      'semester'];
-                                                              int parYear = int
-                                                                  .parse(invitations[
-                                                                          index]
-                                                                      ['year']);
-                                                              int parStatus = 1;
-                                                              await updateInvites(
-                                                                  parInstructorID,
-                                                                  parStudentID!,
-                                                                  parCourseID,
-                                                                  parSectionID,
-                                                                  parSemester,
-                                                                  parYear,
-                                                                  parStatus);
-                                                              setState(() {});
-                                                            },
-                                                            //Contents of the button
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              35.0)),
-                                                              side: const BorderSide(
-                                                                  color: Colors
-                                                                      .green,
-                                                                  width: 1.0,
-                                                                  style:
-                                                                      BorderStyle
-                                                                          .solid),
-                                                              //Change font size
-                                                              textStyle:
-                                                                  const TextStyle(
-                                                                fontSize: 18,
-                                                              ),
-                                                              //Set the background color
-                                                              backgroundColor:
-                                                                  ReusableMethods
-                                                                      .colorLight,
-                                                              //Set the foreground (text + icon) color
-                                                              foregroundColor:
-                                                                  Colors.green,
-                                                              //Set the padding on all sides to 30px
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .all(
-                                                                      16.0),
-                                                            ),
-                                                            icon: const Icon(
-                                                                CupertinoIcons
-                                                                    .check_mark_circled_solid), //Button icon
-                                                            label: const Text(
-                                                              " Accept ",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )),
+                                                                textStyleValue),
                                                       ],
                                                     ),
-                                                  ),
-                                                  Visibility(
-                                                    visible: invitations[index]
-                                                            ['status'] !=
-                                                        '0',
-                                                    child: Container(
-                                                      width: 150,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(35),
-                                                        color: invitations[
-                                                                        index][
-                                                                    'status'] ==
-                                                                '1'
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                      ),
-                                                      child: Card(
+                                                    const SizedBox(
+                                                      height: 10.0,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Credits:',
+                                                          style:
+                                                              textStyleKey,
+                                                        ),
+                                                        const Spacer(),
+                                                        Text(
+                                                            invitations[
+                                                                    index]
+                                                                ['credit'],
+                                                            style:
+                                                                textStyleValue),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10.0,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Semester:',
+                                                          style:
+                                                              textStyleKey,
+                                                        ),
+                                                        const Spacer(),
+                                                        Text(
+                                                            invitations[
+                                                                    index][
+                                                                'semester'],
+                                                            style:
+                                                                textStyleValue),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10.0,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Year:',
+                                                          style:
+                                                              textStyleKey,
+                                                        ),
+                                                        const Spacer(),
+                                                        Text(
+                                                            invitations[
+                                                                    index]
+                                                                ['year'],
+                                                            style:
+                                                                textStyleValue),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 16.0,
+                                              ),
+                                              Visibility(
+                                                visible: invitations[index]
+                                                        ['status'] ==
+                                                    '0',
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    ElevatedButton.icon(
+                                                        //Handle button press event
+                                                        onPressed:
+                                                            () async {
+                                                          int parInstructorID =
+                                                              int.parse(invitations[
+                                                                      index]
+                                                                  [
+                                                                  'instructorID']);
+                                                          int?
+                                                              parStudentID =
+                                                              await ReusableMethods
+                                                                  .getUserId();
+                                                          String
+                                                              parCourseID =
+                                                              invitations[
+                                                                      index]
+                                                                  [
+                                                                  'courseID'];
+                                                          String
+                                                              parSectionID =
+                                                              invitations[
+                                                                      index]
+                                                                  [
+                                                                  'sectionID'];
+                                                          String
+                                                              parSemester =
+                                                              invitations[
+                                                                      index]
+                                                                  [
+                                                                  'semester'];
+                                                          int parYear = int
+                                                              .parse(invitations[
+                                                                      index]
+                                                                  ['year']);
+                                                          int parStatus =
+                                                              -1;
+                                                          await updateInvites(
+                                                              parInstructorID,
+                                                              parStudentID!,
+                                                              parCourseID,
+                                                              parSectionID,
+                                                              parSemester,
+                                                              parYear,
+                                                              parStatus);
+                                                          setState(() {});
+                                                        },
+                                                        //Contents of the button
+                                                        style:
+                                                            ElevatedButton
+                                                                .styleFrom(
                                                           shape: RoundedRectangleBorder(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          35)),
-                                                          color: ReusableMethods
-                                                              .colorLight,
-                                                          elevation:
-                                                              2.0, //Button icon
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        16.0),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                invitations[index]
-                                                                            [
-                                                                            'status'] ==
-                                                                        '-1'
-                                                                    ? Icon(
-                                                                        CupertinoIcons
-                                                                            .multiply_circle_fill,
-                                                                        color: invitations[index]['status'] ==
-                                                                                '-1'
-                                                                            ? Colors.red
-                                                                            : Colors.green,
-                                                                      )
-                                                                    : Icon(
-                                                                        CupertinoIcons
-                                                                            .check_mark_circled_solid,
-                                                                        color: invitations[index]['status'] ==
-                                                                                '-1'
-                                                                            ? Colors.red
-                                                                            : Colors.green,
-                                                                      ),
-                                                                const SizedBox(
-                                                                  width: 8,
-                                                                ),
-                                                                Text(
-                                                                  invitations[index]
-                                                                              [
-                                                                              'status'] ==
-                                                                          '-1'
-                                                                      ? 'Rejected'
-                                                                      : 'Accepted',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        18,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
+                                                                          35.0)),
+                                                          side: const BorderSide(
+                                                              color: Colors
+                                                                  .red,
+                                                              width: 1.0,
+                                                              style:
+                                                                  BorderStyle
+                                                                      .solid),
+                                                          //Change font size
+                                                          textStyle:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                          ),
+                                                          //Set the background color
+                                                          backgroundColor:
+                                                              ReusableMethods
+                                                                  .colorLight,
+                                                          //Set the foreground (text + icon) color
+                                                          foregroundColor:
+                                                              Colors.red,
+                                                          //Set the padding on all sides to 30px
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .all(
+                                                                  16.0),
+                                                        ),
+                                                        icon: const Icon(
+                                                            CupertinoIcons
+                                                                .multiply_circle_fill), //Button icon
+                                                        label: const Text(
+                                                          " Reject ",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                          ),
+                                                        )),
+                                                    ElevatedButton.icon(
+                                                        //Handle button press event
+                                                        onPressed:
+                                                            () async {
+                                                          int parInstructorID =
+                                                              int.parse(invitations[
+                                                                      index]
+                                                                  [
+                                                                  'instructorID']);
+                                                          int?
+                                                              parStudentID =
+                                                              await ReusableMethods
+                                                                  .getUserId();
+                                                          String
+                                                              parCourseID =
+                                                              invitations[
+                                                                      index]
+                                                                  [
+                                                                  'courseID'];
+                                                          String
+                                                              parSectionID =
+                                                              invitations[
+                                                                      index]
+                                                                  [
+                                                                  'sectionID'];
+                                                          String
+                                                              parSemester =
+                                                              invitations[
+                                                                      index]
+                                                                  [
+                                                                  'semester'];
+                                                          int parYear = int
+                                                              .parse(invitations[
+                                                                      index]
+                                                                  ['year']);
+                                                          int parStatus = 1;
+                                                          await updateInvites(
+                                                              parInstructorID,
+                                                              parStudentID!,
+                                                              parCourseID,
+                                                              parSectionID,
+                                                              parSemester,
+                                                              parYear,
+                                                              parStatus);
+                                                          setState(() {});
+                                                        },
+                                                        //Contents of the button
+                                                        style:
+                                                            ElevatedButton
+                                                                .styleFrom(
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          35.0)),
+                                                          side: const BorderSide(
+                                                              color: Colors
+                                                                  .green,
+                                                              width: 1.0,
+                                                              style:
+                                                                  BorderStyle
+                                                                      .solid),
+                                                          //Change font size
+                                                          textStyle:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                          ),
+                                                          //Set the background color
+                                                          backgroundColor:
+                                                              ReusableMethods
+                                                                  .colorLight,
+                                                          //Set the foreground (text + icon) color
+                                                          foregroundColor:
+                                                              Colors.green,
+                                                          //Set the padding on all sides to 30px
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .all(
+                                                                  16.0),
+                                                        ),
+                                                        icon: const Icon(
+                                                            CupertinoIcons
+                                                                .check_mark_circled_solid), //Button icon
+                                                        label: const Text(
+                                                          " Accept ",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                          ),
+                                                        )),
+                                                  ],
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible: invitations[index]
+                                                        ['status'] !=
+                                                    '0',
+                                                child: Container(
+                                                  width: 150,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius
+                                                            .circular(35),
+                                                    color: invitations[
+                                                                    index][
+                                                                'status'] ==
+                                                            '1'
+                                                        ? Colors.green
+                                                        : Colors.red,
+                                                  ),
+                                                  child: Card(
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      35)),
+                                                      color: ReusableMethods
+                                                          .colorLight,
+                                                      elevation:
+                                                          2.0, //Button icon
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                vertical:
+                                                                    16.0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            invitations[index]
+                                                                        [
+                                                                        'status'] ==
+                                                                    '-1'
+                                                                ? Icon(
+                                                                    CupertinoIcons
+                                                                        .multiply_circle_fill,
                                                                     color: invitations[index]['status'] ==
                                                                             '-1'
-                                                                        ? Colors
-                                                                            .red
-                                                                        : Colors
-                                                                            .green,
+                                                                        ? Colors.red
+                                                                        : Colors.green,
+                                                                  )
+                                                                : Icon(
+                                                                    CupertinoIcons
+                                                                        .check_mark_circled_solid,
+                                                                    color: invitations[index]['status'] ==
+                                                                            '-1'
+                                                                        ? Colors.red
+                                                                        : Colors.green,
                                                                   ),
-                                                                ),
-                                                              ],
+                                                            const SizedBox(
+                                                              width: 8,
                                                             ),
-                                                          )),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 16.0,
-                                                  )
-                                                ],
+                                                            Text(
+                                                              invitations[index]
+                                                                          [
+                                                                          'status'] ==
+                                                                      '-1'
+                                                                  ? 'Rejected'
+                                                                  : 'Accepted',
+                                                              style:
+                                                                  TextStyle(
+                                                                fontSize:
+                                                                    18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: invitations[index]['status'] ==
+                                                                        '-1'
+                                                                    ? Colors
+                                                                        .red
+                                                                    : Colors
+                                                                        .green,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )),
+                                                ),
                                               ),
+                                              const SizedBox(
+                                                height: 16.0,
+                                              )
                                             ],
                                           ),
                                         ),
