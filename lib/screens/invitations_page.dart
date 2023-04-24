@@ -26,7 +26,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
   final textStyleValue = TextStyle(
       fontWeight: FontWeight.w600,
       fontSize: 18,
-      color: ReusableMethods.colorProfile3);
+      color: ReusableMethods.colorProfile3_1);
 
   // variables
   late String role;
@@ -198,8 +198,8 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                             0.9,
                                           ],
                                           colors: [
-                                            ReusableMethods.colorProfile3,
-                                            ReusableMethods.colorProfile2,
+                                            ReusableMethods.colorProfile3_1,
+                                            ReusableMethods.colorProfile2_1,
                                             ReusableMethods.colorProfile1,
                                           ],
                                         ),
@@ -216,8 +216,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                invitations[index]
-                                                    ['courseID'],
+                                                invitations[index]['courseID'],
                                                 style: const TextStyle(
                                                   color: Colors.grey,
                                                 ),
@@ -225,22 +224,15 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                               const SizedBox(
                                                 height: 3.0,
                                               ),
-                                              GradientText(
+                                              Text(
                                                 invitations[index]
                                                     ['courseName'],
-                                                style: const TextStyle(
+                                                style: TextStyle(
+                                                  color: ReusableMethods
+                                                      .colorProfile2_1,
                                                   fontSize: 20,
-                                                  fontWeight:
-                                                      FontWeight.w900,
+                                                  fontWeight: FontWeight.w900,
                                                 ),
-                                                colors: [
-                                                  ReusableMethods
-                                                      .colorProfile1,
-                                                  ReusableMethods
-                                                      .colorProfile2,
-                                                  ReusableMethods
-                                                      .colorProfile3,
-                                                ],
                                               ),
                                               const SizedBox(
                                                 height: 10.0,
@@ -261,9 +253,9 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                 height: 10.0,
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets
-                                                        .symmetric(
-                                                    horizontal: 16.0),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0),
                                                 child: Column(
                                                   children: [
                                                     Row(
@@ -285,14 +277,12 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                       children: [
                                                         Text(
                                                           'Department:',
-                                                          style:
-                                                              textStyleKey,
+                                                          style: textStyleKey,
                                                         ),
                                                         const Spacer(),
                                                         Text(
-                                                            invitations[
-                                                                    index][
-                                                                'deptName'],
+                                                            invitations[index]
+                                                                ['deptName'],
                                                             style:
                                                                 textStyleValue),
                                                       ],
@@ -304,13 +294,11 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                       children: [
                                                         Text(
                                                           'Credits:',
-                                                          style:
-                                                              textStyleKey,
+                                                          style: textStyleKey,
                                                         ),
                                                         const Spacer(),
                                                         Text(
-                                                            invitations[
-                                                                    index]
+                                                            invitations[index]
                                                                 ['credit'],
                                                             style:
                                                                 textStyleValue),
@@ -323,14 +311,12 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                       children: [
                                                         Text(
                                                           'Semester:',
-                                                          style:
-                                                              textStyleKey,
+                                                          style: textStyleKey,
                                                         ),
                                                         const Spacer(),
                                                         Text(
-                                                            invitations[
-                                                                    index][
-                                                                'semester'],
+                                                            invitations[index]
+                                                                ['semester'],
                                                             style:
                                                                 textStyleValue),
                                                       ],
@@ -342,13 +328,11 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                       children: [
                                                         Text(
                                                           'Year:',
-                                                          style:
-                                                              textStyleKey,
+                                                          style: textStyleKey,
                                                         ),
                                                         const Spacer(),
                                                         Text(
-                                                            invitations[
-                                                                    index]
+                                                            invitations[index]
                                                                 ['year'],
                                                             style:
                                                                 textStyleValue),
@@ -371,41 +355,29 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                   children: [
                                                     ElevatedButton.icon(
                                                         //Handle button press event
-                                                        onPressed:
-                                                            () async {
+                                                        onPressed: () async {
                                                           int parInstructorID =
                                                               int.parse(invitations[
-                                                                      index]
-                                                                  [
+                                                                      index][
                                                                   'instructorID']);
-                                                          int?
-                                                              parStudentID =
+                                                          int? parStudentID =
                                                               await ReusableMethods
                                                                   .getUserId();
-                                                          String
-                                                              parCourseID =
-                                                              invitations[
-                                                                      index]
-                                                                  [
-                                                                  'courseID'];
-                                                          String
-                                                              parSectionID =
-                                                              invitations[
-                                                                      index]
-                                                                  [
-                                                                  'sectionID'];
-                                                          String
-                                                              parSemester =
-                                                              invitations[
-                                                                      index]
-                                                                  [
-                                                                  'semester'];
-                                                          int parYear = int
-                                                              .parse(invitations[
-                                                                      index]
-                                                                  ['year']);
-                                                          int parStatus =
-                                                              -1;
+                                                          String parCourseID =
+                                                              invitations[index]
+                                                                  ['courseID'];
+                                                          String parSectionID =
+                                                              invitations[index]
+                                                                  ['sectionID'];
+                                                          String parSemester =
+                                                              invitations[index]
+                                                                  ['semester'];
+                                                          int parYear =
+                                                              int.parse(
+                                                                  invitations[
+                                                                          index]
+                                                                      ['year']);
+                                                          int parStatus = -1;
                                                           await updateInvites(
                                                               parInstructorID,
                                                               parStudentID!,
@@ -417,21 +389,18 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           setState(() {});
                                                         },
                                                         //Contents of the button
-                                                        style:
-                                                            ElevatedButton
-                                                                .styleFrom(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
                                                           shape: RoundedRectangleBorder(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
                                                                           35.0)),
                                                           side: const BorderSide(
-                                                              color: Colors
-                                                                  .red,
+                                                              color: Colors.red,
                                                               width: 1.0,
-                                                              style:
-                                                                  BorderStyle
-                                                                      .solid),
+                                                              style: BorderStyle
+                                                                  .solid),
                                                           //Change font size
                                                           textStyle:
                                                               const TextStyle(
@@ -447,8 +416,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           //Set the padding on all sides to 30px
                                                           padding:
                                                               const EdgeInsets
-                                                                      .all(
-                                                                  16.0),
+                                                                  .all(16.0),
                                                         ),
                                                         icon: const Icon(
                                                             CupertinoIcons
@@ -457,45 +425,33 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           " Reject ",
                                                           style: TextStyle(
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                FontWeight.bold,
                                                           ),
                                                         )),
                                                     ElevatedButton.icon(
                                                         //Handle button press event
-                                                        onPressed:
-                                                            () async {
+                                                        onPressed: () async {
                                                           int parInstructorID =
                                                               int.parse(invitations[
-                                                                      index]
-                                                                  [
+                                                                      index][
                                                                   'instructorID']);
-                                                          int?
-                                                              parStudentID =
+                                                          int? parStudentID =
                                                               await ReusableMethods
                                                                   .getUserId();
-                                                          String
-                                                              parCourseID =
-                                                              invitations[
-                                                                      index]
-                                                                  [
-                                                                  'courseID'];
-                                                          String
-                                                              parSectionID =
-                                                              invitations[
-                                                                      index]
-                                                                  [
-                                                                  'sectionID'];
-                                                          String
-                                                              parSemester =
-                                                              invitations[
-                                                                      index]
-                                                                  [
-                                                                  'semester'];
-                                                          int parYear = int
-                                                              .parse(invitations[
-                                                                      index]
-                                                                  ['year']);
+                                                          String parCourseID =
+                                                              invitations[index]
+                                                                  ['courseID'];
+                                                          String parSectionID =
+                                                              invitations[index]
+                                                                  ['sectionID'];
+                                                          String parSemester =
+                                                              invitations[index]
+                                                                  ['semester'];
+                                                          int parYear =
+                                                              int.parse(
+                                                                  invitations[
+                                                                          index]
+                                                                      ['year']);
                                                           int parStatus = 1;
                                                           await updateInvites(
                                                               parInstructorID,
@@ -508,21 +464,19 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           setState(() {});
                                                         },
                                                         //Contents of the button
-                                                        style:
-                                                            ElevatedButton
-                                                                .styleFrom(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
                                                           shape: RoundedRectangleBorder(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
                                                                           35.0)),
                                                           side: const BorderSide(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               width: 1.0,
-                                                              style:
-                                                                  BorderStyle
-                                                                      .solid),
+                                                              style: BorderStyle
+                                                                  .solid),
                                                           //Change font size
                                                           textStyle:
                                                               const TextStyle(
@@ -538,8 +492,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           //Set the padding on all sides to 30px
                                                           padding:
                                                               const EdgeInsets
-                                                                      .all(
-                                                                  16.0),
+                                                                  .all(16.0),
                                                         ),
                                                         icon: const Icon(
                                                             CupertinoIcons
@@ -548,8 +501,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           " Accept ",
                                                           style: TextStyle(
                                                             fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                FontWeight.bold,
                                                           ),
                                                         )),
                                                   ],
@@ -563,21 +515,21 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                   width: 150,
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius
-                                                            .circular(35),
-                                                    color: invitations[
-                                                                    index][
-                                                                'status'] ==
+                                                        BorderRadius.circular(
+                                                            35),
+                                                    color: invitations[index]
+                                                                ['status'] ==
                                                             '1'
                                                         ? Colors.green
                                                         : Colors.red,
                                                   ),
                                                   child: Card(
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      35)),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          35)),
                                                       color: ReusableMethods
                                                           .colorLight,
                                                       elevation:
@@ -586,15 +538,13 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                         padding:
                                                             const EdgeInsets
                                                                     .symmetric(
-                                                                vertical:
-                                                                    16.0),
+                                                                vertical: 16.0),
                                                         child: Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            invitations[index]
-                                                                        [
+                                                            invitations[index][
                                                                         'status'] ==
                                                                     '-1'
                                                                 ? Icon(
@@ -602,16 +552,20 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                                         .multiply_circle_fill,
                                                                     color: invitations[index]['status'] ==
                                                                             '-1'
-                                                                        ? Colors.red
-                                                                        : Colors.green,
+                                                                        ? Colors
+                                                                            .red
+                                                                        : Colors
+                                                                            .green,
                                                                   )
                                                                 : Icon(
                                                                     CupertinoIcons
                                                                         .check_mark_circled_solid,
                                                                     color: invitations[index]['status'] ==
                                                                             '-1'
-                                                                        ? Colors.red
-                                                                        : Colors.green,
+                                                                        ? Colors
+                                                                            .red
+                                                                        : Colors
+                                                                            .green,
                                                                   ),
                                                             const SizedBox(
                                                               width: 8,
@@ -623,17 +577,16 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                                       '-1'
                                                                   ? 'Rejected'
                                                                   : 'Accepted',
-                                                              style:
-                                                                  TextStyle(
-                                                                fontSize:
-                                                                    18,
+                                                              style: TextStyle(
+                                                                fontSize: 18,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: invitations[index]['status'] ==
+                                                                color: invitations[index]
+                                                                            [
+                                                                            'status'] ==
                                                                         '-1'
-                                                                    ? Colors
-                                                                        .red
+                                                                    ? Colors.red
                                                                     : Colors
                                                                         .green,
                                                               ),

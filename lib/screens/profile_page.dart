@@ -122,8 +122,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               );
             default:
-              return ListView(
-                padding: EdgeInsets.zero,
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   buildTop(),
                   buildContent(),
