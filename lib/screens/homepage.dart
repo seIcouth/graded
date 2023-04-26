@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:graded/screens/course_page.dart';
 import 'package:graded/screens/people_page.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import 'package:graded/models/home_notification.dart' as ntf;
 import 'package:graded/resources/reusable_methods.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import '../resources/reusable_widgets.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -275,32 +277,43 @@ class _HomePageState extends State<HomePage> {
       if (recentNotifications[i] is ntf.AssignmentNotification) {
         ntf.AssignmentNotification s =
             recentNotifications[i] as ntf.AssignmentNotification;
-        dummyNotifications.add(assignmentNotificationCard(context, s.title,
+        dummyNotifications.add(ReusableWidgets.assignmentNotificationCard(context, s.title,
             s.content, s.courseCode, s.courseName, s.dueDate));
       } else {
         ntf.AnnouncementNotification n =
             recentNotifications[i] as ntf.AnnouncementNotification;
-        dummyNotifications.add(announcementNotificationCard(
+        dummyNotifications.add(ReusableWidgets.announcementNotificationCard(
             context, n.title, n.content, n.courseCode, n.courseName));
       }
     }
 
     return Scaffold(
       appBar: AppBar(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4.0),
+          child: Container(
+            color: ReusableMethods.colorDark,
+            height: 3.0,
+          ),
+        ),
+        backgroundColor: ReusableMethods.colorLight,
         leading: IconButton(
           icon: Icon(
             CupertinoIcons.bars,
-            color: ReusableMethods.colorLight,
+            color: ReusableMethods.colorDark,
           ),
           onPressed: () {
             SimpleHiddenDrawerController.of(context).open();
           },
         ),
+        centerTitle: true,
+        shadowColor: ReusableMethods.colorDark,
         title: Text(
           "Home",
           style: TextStyle(
-            color: ReusableMethods.colorLight,
+            color: ReusableMethods.colorDark,
             fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
       ),
@@ -309,7 +322,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Center(
               child: Column(
                 children: [
@@ -448,9 +461,13 @@ class _HomePageState extends State<HomePage> {
                                               context,
                                               courses[i]['courseID'],
                                               courses[i]['name'],
+                                              courses[i]['deptName'],
+                                              courses[i]['credit'],
                                               courses[i]['sectionID'],
                                               courses[i]['semester'],
                                               courses[i]['year'],
+                                              courses[i]['instructorName'],
+                                              courses[i]['surname'],
                                             );
                                           },
                                         );
@@ -1135,340 +1152,140 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget courseCard(BuildContext context, String courseID, String courseName, String sectionID, String semester, String year) {
+  Widget courseCard(BuildContext context, String courseID, String courseName, String deptName, String credit, String sectionID, String semester, String year, String instructorName, String instructorSurname) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            stops: const [
-              0.1,
-              0.4,
-              0.6,
-              0.9,
-            ],
-            colors: [
-              ReusableMethods.colorGrades,
-              ReusableMethods.colorPeople,
-              ReusableMethods.colorAssignment,
-              ReusableMethods.colorAnnouncement,
-            ],
-          ),
-        ),
-        child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          color: ReusableMethods.colorLight,
-          elevation: 2.0,
-          child: Container(
-            margin: const EdgeInsets.all(8.0),
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      courseID,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 3.0,
-                    ),
-                    Text(
-                      courseName,
-                      style: TextStyle(
-                        color: ReusableMethods.colorDark,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    const Divider(
-                      color: Colors.grey,
-                      //color of divider
-                      height: 5,
-                      //height spacing of divider
-                      thickness: 2.0,
-                      //thickness of divider line
-                      indent: 5,
-                      //spacing at the start of divider
-                      endIndent: 5, //spacing at the end of divider
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.announcement_rounded,
-                            color: ReusableMethods.colorAnnouncement,
-                          ),
-                          tooltip: "announcements",
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.assignment_outlined,
-                            color: ReusableMethods.colorAssignment,
-                          ),
-                          tooltip: "assignments",
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => PeoplePage(courseID: courseID, sectionID: sectionID, semester: semester, year: year,),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            CupertinoIcons.person_2_fill,
-                            color: ReusableMethods.colorPeople,
-                          ),
-                          tooltip: "people",
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            CupertinoIcons.chart_bar_alt_fill,
-                            color: ReusableMethods.colorGrades,
-                          ),
-                          tooltip: "grades",
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+      child: InkWell(
+        onTap: (){
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CoursePage(
+                  courseID: courseID,
+                  courseName: courseName,
+                  courseDeptName: deptName,
+                  courseCredit: credit,
+                  courseSectionID: sectionID,
+                  courseSemester: semester,
+                  courseYear: year,
+                instructorName: instructorName,
+                instructorSurname: instructorSurname,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              stops: const [
+                0.1,
+                0.4,
+                0.6,
+                0.9,
+              ],
+              colors: [
+                ReusableMethods.colorGrades,
+                ReusableMethods.colorPeople,
+                ReusableMethods.colorAssignment,
+                ReusableMethods.colorAnnouncement,
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget announcementNotificationCard(
-    BuildContext context,
-    String title,
-    String content,
-    String courseCode,
-    String courseName,
-  ) {
-    return Card(
-      color: ReusableMethods.colorAnnouncement,
-      elevation: 6,
-      shadowColor: ReusableMethods.colorDark,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: ReusableMethods.colorLight,
-        elevation: 2.0,
-        child: Container(
-          margin: const EdgeInsets.all(8.0),
-          child: Stack(
-            children: [
-              Column(
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            color: ReusableMethods.colorLight,
+            elevation: 2.0,
+            child: Container(
+              margin: const EdgeInsets.all(8.0),
+              width: double.infinity,
+              child: Stack(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Column(
+                  Column(
+                    children: [
+                      Text(
+                        courseID,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 3.0,
+                      ),
+                      Text(
+                        courseName,
+                        style: TextStyle(
+                          color: ReusableMethods.colorDark,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      const Divider(
+                        color: Colors.grey,
+                        //color of divider
+                        height: 5,
+                        //height spacing of divider
+                        thickness: 2.0,
+                        //thickness of divider line
+                        indent: 5,
+                        //spacing at the start of divider
+                        endIndent: 5, //spacing at the end of divider
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.announcement_rounded,
-                                color: ReusableMethods.colorAnnouncement,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: ReusableMethods.colorAnnouncement,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  softWrap: false,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          const Divider(
-                            color: Colors.grey,
-                            //color of divider
-                            height: 5,
-                            //height spacing of divider
-                            thickness: 1.5,
-                            //thickness of divider line
-                            indent: 5,
-                            //spacing at the start of divider
-                            endIndent: 5, //spacing at the end of divider
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            content,
-                            style: TextStyle(
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              //CupertinoIcons.news_solid,
+                              Icons.announcement_rounded,
                               color: ReusableMethods.colorAnnouncement,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
                             ),
-                            softWrap: false,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.left,
+                            tooltip: "announcements",
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 2.0),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    "$courseCode • $courseName",
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    softWrap: false,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget assignmentNotificationCard(
-    BuildContext context,
-    String title,
-    String content,
-    String courseCode,
-    String courseName,
-    String dueDate,
-  ) {
-    return Card(
-      color: ReusableMethods.colorAssignment,
-      elevation: 6,
-      shadowColor: ReusableMethods.colorDark,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: ReusableMethods.colorLight,
-        elevation: 2.0,
-        child: Container(
-          margin: const EdgeInsets.all(8.0),
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.assignment_outlined,
-                                color: ReusableMethods.colorAssignment,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: ReusableMethods.colorAssignment,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  softWrap: false,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          const Divider(
-                            color: Colors.grey,
-                            //color of divider
-                            height: 5,
-                            //height spacing of divider
-                            thickness: 1.5,
-                            //thickness of divider line
-                            indent: 5,
-                            //spacing at the start of divider
-                            endIndent: 5, //spacing at the end of divider
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            content,
-                            style: TextStyle(
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              //CupertinoIcons.square_list_fill,
+                              Icons.assignment_outlined,
                               color: ReusableMethods.colorAssignment,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
                             ),
-                            softWrap: false,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.left,
+                            tooltip: "assignments",
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => PeoplePage(courseID: courseID, sectionID: sectionID, semester: semester, year: year,),
+                                ),
+                              );
+                            },
+                            icon: Icon(
+                              CupertinoIcons.person_2_fill,
+                              color: ReusableMethods.colorPeople,
+                            ),
+                            tooltip: "people",
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(
+                              CupertinoIcons.chart_bar_alt_fill,
+                              color: ReusableMethods.colorGrades,
+                            ),
+                            tooltip: "grades",
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 2.0),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    "$courseCode • DUE: $dueDate",
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
-                    softWrap: false,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

@@ -127,6 +127,17 @@ class _InvitationsPageState extends State<InvitationsPage> {
     }
   }
 
+  String abbreviateDepartmentName(String departmentName) {
+    List<String> words = departmentName.split(' ');
+    String abbreviation = '';
+    for (String word in words) {
+      if (word.isNotEmpty) {
+        abbreviation += word[0].toUpperCase();
+      }
+    }
+    return abbreviation;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -264,10 +275,14 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                             style:
                                                                 textStyleKey),
                                                         const Spacer(),
-                                                        Text(
-                                                            '${invitations[index]['instructorName']} ${invitations[index]['surname']}',
-                                                            style:
-                                                                textStyleValue),
+                                                        Align(
+                                                          alignment: Alignment.centerRight,
+                                                          child: Text(
+                                                              '${invitations[index]['instructorName']} ${invitations[index]['surname']}',
+                                                            style: textStyleValue,
+                                                            textAlign: TextAlign.right,
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
                                                     const SizedBox(
@@ -280,11 +295,34 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           style: textStyleKey,
                                                         ),
                                                         const Spacer(),
-                                                        Text(
-                                                            invitations[index]
-                                                                ['deptName'],
-                                                            style:
-                                                                textStyleValue),
+                                                        Flexible(
+                                                          child: Align(
+                                                            alignment: Alignment.centerRight,
+                                                            child: LayoutBuilder(
+                                                              builder: (context, constraints) {
+                                                                String deptName = invitations[index]['deptName'];
+                                                                TextPainter painter = TextPainter(
+                                                                  text: TextSpan(
+                                                                    text: deptName,
+                                                                    style: textStyleValue,
+                                                                  ),
+                                                                  maxLines: 1,
+                                                                  textDirection: TextDirection.ltr,
+                                                                )..layout(maxWidth: constraints.maxWidth);
+                                                                if (painter.didExceedMaxLines) {
+                                                                  deptName = abbreviateDepartmentName(deptName);
+                                                                }
+                                                                return Text(
+                                                                  deptName,
+                                                                  style: textStyleValue,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                  maxLines: 1,
+                                                                  textAlign: TextAlign.right,
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
                                                     const SizedBox(
@@ -301,7 +339,8 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                             invitations[index]
                                                                 ['credit'],
                                                             style:
-                                                                textStyleValue),
+                                                                textStyleValue
+                                                        ),
                                                       ],
                                                     ),
                                                     const SizedBox(

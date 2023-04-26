@@ -15,7 +15,9 @@ class ReusableMethods {
   static Color colorProfile2_1 = const Color(0xffE47668);
   static Color colorProfile3 = const Color(0xffFFB25D).withOpacity(0.8);
   static Color colorProfile3_1 = const Color(0xffFFB25D);
-
+  static Color colorCourse_1 = const Color(0xff0e1c26);
+  static Color colorCourse_2 = const Color(0xff2a454b);
+  static Color colorCourse_3 = const Color(0xff294861);
   /*
     > announcements : #2E3192 → #1BFFFF
     > assignments : #FF5F6D -> #FFC371
