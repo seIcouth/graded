@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
 import '../resources/reusable_methods.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class InvitationsPage extends StatefulWidget {
   const InvitationsPage({super.key});
@@ -276,11 +275,14 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                                 textStyleKey),
                                                         const Spacer(),
                                                         Align(
-                                                          alignment: Alignment.centerRight,
+                                                          alignment: Alignment
+                                                              .centerRight,
                                                           child: Text(
-                                                              '${invitations[index]['instructorName']} ${invitations[index]['surname']}',
-                                                            style: textStyleValue,
-                                                            textAlign: TextAlign.right,
+                                                            '${invitations[index]['instructorName']} ${invitations[index]['surname']}',
+                                                            style:
+                                                                textStyleValue,
+                                                            textAlign:
+                                                                TextAlign.right,
                                                           ),
                                                         ),
                                                       ],
@@ -297,27 +299,52 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                         const Spacer(),
                                                         Flexible(
                                                           child: Align(
-                                                            alignment: Alignment.centerRight,
-                                                            child: LayoutBuilder(
-                                                              builder: (context, constraints) {
-                                                                String deptName = invitations[index]['deptName'];
-                                                                TextPainter painter = TextPainter(
-                                                                  text: TextSpan(
-                                                                    text: deptName,
-                                                                    style: textStyleValue,
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child:
+                                                                LayoutBuilder(
+                                                              builder: (context,
+                                                                  constraints) {
+                                                                String
+                                                                    deptName =
+                                                                    invitations[
+                                                                            index]
+                                                                        [
+                                                                        'deptName'];
+                                                                TextPainter
+                                                                    painter =
+                                                                    TextPainter(
+                                                                  text:
+                                                                      TextSpan(
+                                                                    text:
+                                                                        deptName,
+                                                                    style:
+                                                                        textStyleValue,
                                                                   ),
                                                                   maxLines: 1,
-                                                                  textDirection: TextDirection.ltr,
-                                                                )..layout(maxWidth: constraints.maxWidth);
-                                                                if (painter.didExceedMaxLines) {
-                                                                  deptName = abbreviateDepartmentName(deptName);
+                                                                  textDirection:
+                                                                      TextDirection
+                                                                          .ltr,
+                                                                )..layout(
+                                                                        maxWidth:
+                                                                            constraints.maxWidth);
+                                                                if (painter
+                                                                    .didExceedMaxLines) {
+                                                                  deptName =
+                                                                      abbreviateDepartmentName(
+                                                                          deptName);
                                                                 }
                                                                 return Text(
                                                                   deptName,
-                                                                  style: textStyleValue,
-                                                                  overflow: TextOverflow.ellipsis,
+                                                                  style:
+                                                                      textStyleValue,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
                                                                   maxLines: 1,
-                                                                  textAlign: TextAlign.right,
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .right,
                                                                 );
                                                               },
                                                             ),
@@ -339,8 +366,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                             invitations[index]
                                                                 ['credit'],
                                                             style:
-                                                                textStyleValue
-                                                        ),
+                                                                textStyleValue),
                                                       ],
                                                     ),
                                                     const SizedBox(

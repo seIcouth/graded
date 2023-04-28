@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:graded/screens/people_page.dart';
 import 'package:intl/intl.dart';
 import '../resources/reusable_methods.dart';
 import 'package:graded/models/home_notification.dart' as ntf;
@@ -532,7 +533,15 @@ class _CoursePageState extends State<CoursePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: InkWell(
-        onTap: (){},
+        onTap: (){
+          if(title=='People'){
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => PeoplePage(courseID: widget.courseID, sectionID: widget.courseSectionID, semester: widget.courseSemester, year: widget.courseYear,),
+              ),
+            );
+          }
+        },
         child: Container(
           width: (MediaQuery.of(context).size.width - 56)/2,
           decoration: BoxDecoration(

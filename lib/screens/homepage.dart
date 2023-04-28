@@ -32,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   int year = 2020;
   String? studentMail;
   String inviteCourseID = 'Select a course';
+  String? announcementTitle;
+  String? announcementContent;
 
   late String role;
 
@@ -229,6 +231,45 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> publishAnnouncement(
+      String parCourseID,
+      String parSectionID,
+      String parSemester,
+      int parYear,
+      String parTitle,
+      String parContent,
+      String parPublishDate) async {
+    try {
+      // Prepare the request body as a Map
+      final requestBody = {
+        'courseID': parCourseID,
+        'sectionID': parSectionID,
+        'semester': parSemester,
+        'year': parYear.toString(),
+        'title': parTitle,
+        'content': parContent,
+        'publishDate': parPublishDate,
+      };
+
+      // Send a POST request to the publishannouncement.php file on the server
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2/graded/publishannouncement.php'),
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        // Announcement published successfully
+        print('Announcement published successfully');
+      } else {
+        // Handle any errors from the server
+        print('Failed to publish announcement: ${response.body}');
+      }
+    } catch (e) {
+      // Handle any errors locally
+      print('Failed to publish announcement: $e');
+    }
+  }
+
   static String formatDate(DateTime date) =>
       DateFormat("MMMM d - hh:mm").format(date);
 
@@ -277,8 +318,13 @@ class _HomePageState extends State<HomePage> {
       if (recentNotifications[i] is ntf.AssignmentNotification) {
         ntf.AssignmentNotification s =
             recentNotifications[i] as ntf.AssignmentNotification;
-        dummyNotifications.add(ReusableWidgets.assignmentNotificationCard(context, s.title,
-            s.content, s.courseCode, s.courseName, s.dueDate));
+        dummyNotifications.add(ReusableWidgets.assignmentNotificationCard(
+            context,
+            s.title,
+            s.content,
+            s.courseCode,
+            s.courseName,
+            s.dueDate));
       } else {
         ntf.AnnouncementNotification n =
             recentNotifications[i] as ntf.AnnouncementNotification;
@@ -760,6 +806,289 @@ class _HomePageState extends State<HomePage> {
                             })),
                     SpeedDialChild(
                         child: Icon(
+                          Icons.announcement_rounded,
+                          color: ReusableMethods.colorDark,
+                          size: 30,
+                        ),
+                        label: 'Make Announcement',
+                        labelStyle: TextStyle(color: ReusableMethods.colorDark),
+                        labelBackgroundColor: ReusableMethods.colorLight,
+                        backgroundColor: ReusableMethods.colorLight,
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: ReusableMethods.colorLight,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                                content: Stack(
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Make an Announcement',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 24.0,
+                                                color:
+                                                    ReusableMethods.colorDark,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 20.0,
+                                          ),
+                                          Form(
+                                            child: Column(
+                                              children: [
+                                                DropdownButtonFormField(
+                                                    dropdownColor:
+                                                        ReusableMethods
+                                                            .colorLight,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    decoration: InputDecoration(
+                                                        border: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            borderSide: BorderSide(
+                                                                width: 1,
+                                                                color: ReusableMethods
+                                                                    .colorDark))),
+                                                    value: inviteCourseID,
+                                                    items: inviteCourses
+                                                        .map((item) =>
+                                                            DropdownMenuItem(
+                                                              value: item,
+                                                              child: Text(item,
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          16)),
+                                                            ))
+                                                        .toList(),
+                                                    onChanged: (item) =>
+                                                        setState(
+                                                          () => inviteCourseID =
+                                                              item!,
+                                                        )),
+                                                const SizedBox(height: 20.0),
+                                                TextFormField(
+                                                  onChanged: (value) {
+                                                    announcementTitle = value;
+                                                  },
+                                                  keyboardType:
+                                                      TextInputType.name,
+                                                  maxLines: null,
+                                                  maxLength: 80,
+                                                  decoration: InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        width: 5,
+                                                        color: ReusableMethods
+                                                            .colorDark,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                    ),
+                                                    labelText: 'Title',
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15.0),
+                                                TextFormField(
+                                                  onChanged: (value) {
+                                                    announcementContent = value;
+                                                  },
+                                                  keyboardType:
+                                                      TextInputType.name,
+                                                  minLines: 3,
+                                                  maxLines: null,
+                                                  maxLength: 400,
+                                                  decoration: InputDecoration(
+                                                    border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        width: 5,
+                                                        color: ReusableMethods
+                                                            .colorDark,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                    ),
+                                                    alignLabelWithHint:
+                                                        true, // Add this line to align the hint text with the top
+                                                    labelText:
+                                                        'Enter your announcement here',
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 20.0),
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    if (announcementContent !=
+                                                            null &&
+                                                        announcementTitle !=
+                                                            null &&
+                                                        inviteCourseID !=
+                                                            'Select a course') {
+                                                      String
+                                                          inviteCourseSemester =
+                                                          await getInviteCourseSemester(
+                                                              inviteCourseID);
+                                                      int inviteCourseYear =
+                                                          await getInviteCourseYear(
+                                                              inviteCourseID);
+                                                      String
+                                                          inviteCourseSectionID =
+                                                          await getInviteCourseSectionID(
+                                                              inviteCourseID);
+                                                      await publishAnnouncement(
+                                                        inviteCourseID,
+                                                        inviteCourseSectionID,
+                                                        inviteCourseSemester,
+                                                        inviteCourseYear,
+                                                        announcementTitle!,
+                                                        announcementContent!,
+                                                        DateTime.now()
+                                                            .toString(),
+                                                      );
+                                                      // ignore: use_build_context_synchronously
+                                                      setState(() {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      });
+                                                      // ignore: use_build_context_synchronously
+                                                      Flushbar(
+                                                        message:
+                                                            "Announcement published in $inviteCourseID",
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                        margin: EdgeInsets.only(
+                                                            // ignore: use_build_context_synchronously
+                                                            bottom: MediaQuery.of(
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
+                                                                20),
+                                                      ).show(context);
+                                                    } else if (announcementContent !=
+                                                            null &&
+                                                        announcementTitle !=
+                                                            null &&
+                                                        inviteCourseID ==
+                                                            'Select a course') {
+                                                      Flushbar(
+                                                        message:
+                                                            "Please select a course.",
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                        margin: EdgeInsets.only(
+                                                            bottom: MediaQuery.of(
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
+                                                                20),
+                                                      ).show(context);
+                                                    } else {
+                                                      Flushbar(
+                                                        message:
+                                                            "Please fill all necessary fields.",
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                        margin: EdgeInsets.only(
+                                                            // ignore: use_build_context_synchronously
+                                                            bottom: MediaQuery.of(
+                                                                        context)
+                                                                    .viewInsets
+                                                                    .bottom +
+                                                                20),
+                                                      ).show(context);
+                                                    }
+                                                  },
+                                                  style: ButtonStyle(
+                                                    shape: MaterialStateProperty
+                                                        .all<
+                                                            RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20.0),
+                                                      ),
+                                                    ),
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent),
+                                                    // Set overlayColor to Colors.transparent to remove the purple shadow
+                                                    overlayColor:
+                                                        MaterialStateProperty
+                                                            .all<Color>(Colors
+                                                                .transparent),
+                                                    elevation:
+                                                        MaterialStateProperty
+                                                            .all<double>(0),
+                                                  ),
+                                                  child: Container(
+                                                    width: double.infinity,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            15),
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        colors: [
+                                                          ReusableMethods
+                                                              .colorProfile1,
+                                                          ReusableMethods
+                                                              .colorProfile2,
+                                                          ReusableMethods
+                                                              .colorProfile3,
+                                                        ],
+                                                        begin: Alignment
+                                                            .centerLeft,
+                                                        end: Alignment
+                                                            .centerRight,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
+                                                    ),
+                                                    child: const Align(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        'Publish',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //const SizedBox(height: 10.0),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            })),
+                    SpeedDialChild(
+                        child: Icon(
                           Icons.library_add_outlined,
                           color: ReusableMethods.colorDark,
                           size: 30,
@@ -1152,21 +1481,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget courseCard(BuildContext context, String courseID, String courseName, String deptName, String credit, String sectionID, String semester, String year, String instructorName, String instructorSurname) {
+  Widget courseCard(
+      BuildContext context,
+      String courseID,
+      String courseName,
+      String deptName,
+      String credit,
+      String sectionID,
+      String semester,
+      String year,
+      String instructorName,
+      String instructorSurname) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: InkWell(
-        onTap: (){
+        onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => CoursePage(
-                  courseID: courseID,
-                  courseName: courseName,
-                  courseDeptName: deptName,
-                  courseCredit: credit,
-                  courseSectionID: sectionID,
-                  courseSemester: semester,
-                  courseYear: year,
+                courseID: courseID,
+                courseName: courseName,
+                courseDeptName: deptName,
+                courseCredit: credit,
+                courseSectionID: sectionID,
+                courseSemester: semester,
+                courseYear: year,
                 instructorName: instructorName,
                 instructorSurname: instructorSurname,
               ),
@@ -1261,7 +1600,12 @@ class _HomePageState extends State<HomePage> {
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => PeoplePage(courseID: courseID, sectionID: sectionID, semester: semester, year: year,),
+                                  builder: (context) => PeoplePage(
+                                    courseID: courseID,
+                                    sectionID: sectionID,
+                                    semester: semester,
+                                    year: year,
+                                  ),
                                 ),
                               );
                             },
