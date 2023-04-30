@@ -1,11 +1,13 @@
+import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:graded/screens/announcement_page.dart';
 import 'package:graded/screens/people_page.dart';
 import 'package:intl/intl.dart';
 import '../resources/reusable_methods.dart';
-import 'package:graded/models/home_notification.dart' as ntf;
 import '../resources/reusable_widgets.dart';
+import 'package:http/http.dart' as http;
 
 class CoursePage extends StatefulWidget {
   const CoursePage({
@@ -40,61 +42,41 @@ class _CoursePageState extends State<CoursePage> {
   static String formatDate(DateTime date) =>
       DateFormat("MMMM d - hh:mm").format(date);
 
+  late List<dynamic> courseAnnouncements;
+  // TODO: late List<dynamic> courseAssignments;
   // dummy list (will change)
-  List<Widget> dummyNotifications = [];
+  List<Widget> courseNotifications = [];
 
-  List<ntf.Notification> recentNotifications = [
-    ntf.AnnouncementNotification(
-      title: "First Lecture",
-      content:
-      "Hello everyone, we will start the lectures on Monday. Lectures will be held on F0D11. See you at the class.",
-      courseCode: "COMP101",
-      courseName: "Art of Computing",
-    ),
-    ntf.AssignmentNotification(
-        title: "First Lecture",
-        content:
-        "You're expected to implement a java method that finds whether a given number is a prime number or not.",
-        courseCode: "COMP101",
-        courseName: "Art of Computing",
-        dueDate: formatDate(DateTime.now())),
-    ntf.AnnouncementNotification(
-        title: "Hyflex Lectures",
-        content:
-        "We will have hyflex lectures during this semester according to YOK's new regulations. Get prepared.",
-        courseCode: "MATH151",
-        courseName: "Calculus I"),
-    ntf.AnnouncementNotification(
-      title: "About Week-1",
-      content:
-      "Read the discussions and try to answer the question before the lecture. Also, don't forget to watch the recorded videos.",
-      courseCode: "TURK101",
-      courseName: "Turkish I",
-    ),
-    ntf.AnnouncementNotification(
-      title: "First Quiz",
-      content:
-      "We will have our first quiz on monday, second lecture. Good luck.",
-      courseCode: "PHYS101",
-      courseName: "Physics I",
-    ),
-  ];
+  // accessor methods
+  Future<List<dynamic>> getAnnouncements() async {
+    String parCourseID = widget.courseID;
+    String parSectionID = widget.courseSectionID;
+    String parSemester = widget.courseSemester;
+    String parYear = widget.courseYear;
+    final url = 'http://10.0.2.2/graded/getannouncements.php?courseID=$parCourseID&sectionID=$parSectionID&semester=$parSemester&year=$parYear';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      courseAnnouncements = json.decode(response.body);
+      courseAnnouncements = courseAnnouncements.reversed.toList();
+
+      for(int i=0; i<courseAnnouncements.length; i++){
+        courseNotifications.add(ReusableWidgets.announcementNotificationCard(context,
+            courseAnnouncements[i]['title'], courseAnnouncements[i]['content'], widget.courseID, widget.courseName, courseAnnouncements[i]['publishDate']));
+      }
+
+      return courseAnnouncements;
+    } else {
+      throw Exception('Failed to load announcements');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    for (int i = 0; i < recentNotifications.length; i++) {
-      if (recentNotifications[i] is ntf.AssignmentNotification) {
-        ntf.AssignmentNotification s =
-        recentNotifications[i] as ntf.AssignmentNotification;
-        dummyNotifications.add(ReusableWidgets.assignmentNotificationCard(context, s.title,
-            s.content, s.courseCode, s.courseName, s.dueDate));
-      } else {
-        ntf.AnnouncementNotification n =
-        recentNotifications[i] as ntf.AnnouncementNotification;
-        dummyNotifications.add(ReusableWidgets.announcementNotificationCard(
-            context, n.title, n.content, n.courseCode, n.courseName));
-      }
-    }
+    /*
+      courseNotifications.add(ReusableWidgets.assignmentNotificationCard(context, s.title,
+          s.content, s.courseCode, s.courseName, s.dueDate));
+     */
 
     return Scaffold(
       appBar: AppBar(
@@ -506,15 +488,33 @@ class _CoursePageState extends State<CoursePage> {
                               ),
                             ),
                           ),
-                          CarouselSlider(
-                            options: CarouselOptions(
-                              autoPlay: true,
-                              aspectRatio: 2.1,
-                              enlargeCenterPage: true,
-                              enableInfiniteScroll: false,
-                              initialPage: 0,
-                            ),
-                            items: dummyNotifications,
+                          FutureBuilder(
+                            future: getAnnouncements(),
+                            builder: (context, AsyncSnapshot<void> snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              }
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.waiting:
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      backgroundColor: ReusableMethods.colorLight,
+                                      color: ReusableMethods.colorDark,
+                                    ),
+                                  );
+                                default:
+                                  return CarouselSlider(
+                                    options: CarouselOptions(
+                                      autoPlay: true,
+                                      aspectRatio: 2.1,
+                                      enlargeCenterPage: true,
+                                      enableInfiniteScroll: false,
+                                      initialPage: 0,
+                                    ),
+                                    items: courseNotifications,
+                                  );
+                              }
+                            },
                           ),
                         ],
                       ),
@@ -538,6 +538,18 @@ class _CoursePageState extends State<CoursePage> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => PeoplePage(courseID: widget.courseID, sectionID: widget.courseSectionID, semester: widget.courseSemester, year: widget.courseYear,),
+              ),
+            );
+          } else if(title=='Announcements'){
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AnnouncementPage(
+                  courseID: widget.courseID,
+                  courseSectionID: widget.courseSectionID,
+                  courseSemester: widget.courseSemester,
+                  courseYear: widget.courseYear,
+                  courseName: widget.courseName,
+                ),
               ),
             );
           }

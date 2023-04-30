@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:graded/screens/announcement_page.dart';
 import 'package:graded/screens/course_page.dart';
 import 'package:graded/screens/people_page.dart';
 import 'package:intl/intl.dart';
@@ -319,7 +320,7 @@ class _HomePageState extends State<HomePage> {
         ntf.AssignmentNotification s =
             recentNotifications[i] as ntf.AssignmentNotification;
         dummyNotifications.add(ReusableWidgets.assignmentNotificationCard(
-            context,
+          context,
             s.title,
             s.content,
             s.courseCode,
@@ -329,7 +330,7 @@ class _HomePageState extends State<HomePage> {
         ntf.AnnouncementNotification n =
             recentNotifications[i] as ntf.AnnouncementNotification;
         dummyNotifications.add(ReusableWidgets.announcementNotificationCard(
-            context, n.title, n.content, n.courseCode, n.courseName));
+            context, n.title, n.content, n.courseCode, n.courseName, DateTime.now().toString()));
       }
     }
 
@@ -803,7 +804,9 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
                               );
-                            })),
+                            }
+                            )
+                    ),
                     SpeedDialChild(
                         child: Icon(
                           Icons.announcement_rounded,
@@ -1579,7 +1582,19 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => AnnouncementPage(
+                                    courseID: courseID,
+                                    courseSectionID: sectionID,
+                                    courseSemester: semester,
+                                    courseYear: year,
+                                    courseName: courseName,
+                                  ),
+                                ),
+                              );
+                            },
                             icon: Icon(
                               //CupertinoIcons.news_solid,
                               Icons.announcement_rounded,
