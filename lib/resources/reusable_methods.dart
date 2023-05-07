@@ -15,11 +15,13 @@ class ReusableMethods {
   static Color colorProfile2_1 = const Color(0xffE47668);
   static Color colorProfile3 = const Color(0xffFFB25D).withOpacity(0.8);
   static Color colorProfile3_1 = const Color(0xffFFB25D);
-  static Color colorCourse_1 = const Color(0xff0e1c26);
-  static Color colorCourse_2 = const Color(0xff2a454b);
-  static Color colorCourse_3 = const Color(0xff294861);
-  static Color colorAnnouncement_1 = const Color(0xff2E3192);
-  static Color colorAnnouncement_2 = const Color(0xff1BFFFF).withOpacity(0.4);
+  static Color colorCourse1 = const Color(0xff0e1c26);
+  static Color colorCourse2 = const Color(0xff2a454b);
+  static Color colorCourse3 = const Color(0xff294861);
+  static Color colorAnnouncement1 = const Color(0xff2E3192);
+  static Color colorAnnouncement2 = const Color(0xff1BFFFF).withOpacity(0.4);
+  static Color colorAssignment1 = const Color(0xffFF5F6D);
+  static Color colorAssignment2 = const Color(0xffFFC371);
   /*
     > announcements : #2E3192 → #1BFFFF
     > assignments : #FF5F6D -> #FFC371
