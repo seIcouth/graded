@@ -192,6 +192,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                             : ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: invitations.length,
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(

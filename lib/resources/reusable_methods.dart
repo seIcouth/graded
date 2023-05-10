@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReusableMethods {
@@ -58,5 +59,11 @@ class ReusableMethods {
   static Future<int?> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getInt('id');
+  }
+
+  static String formatDate(String date) {
+    DateTime dateTime = DateTime.parse(date);
+    String formattedDate = DateFormat('d MMM y \'at\' HH:mm').format(dateTime);
+    return formattedDate;
   }
 }

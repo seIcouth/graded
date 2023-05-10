@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:graded/screens/announcement_page.dart';
 import 'package:graded/screens/assignment_page.dart';
 import 'package:graded/screens/people_page.dart';
-import 'package:intl/intl.dart';
 import '../resources/reusable_methods.dart';
 import '../resources/reusable_widgets.dart';
 import 'package:http/http.dart' as http;
@@ -41,15 +40,61 @@ class CoursePage extends StatefulWidget {
 }
 
 class _CoursePageState extends State<CoursePage> {
-  static String formatDate(DateTime date) =>
-      DateFormat("MMMM d - hh:mm").format(date);
 
   late List<dynamic> courseAnnouncements;
   late List<dynamic> courseAssignments;
   // dummy list (will change)
-  List<Widget> courseNotifications = [];
+  List<Widget> courseNotificationsToDisplay = [];
+  List<dynamic> courseNotifications = [];
 
   // accessor methods
+  Future<void> formNotifications() async{
+    courseNotifications = [];
+    courseNotificationsToDisplay = [];
+
+    List<dynamic> announcements = await getAnnouncements();
+    List<dynamic> assignments = await getAssignments();
+
+    // merge the announcements and assignments into one list
+    courseNotifications.addAll(announcements);
+    courseNotifications.addAll(assignments);
+
+    // sort the notifications based on the publish date
+    courseNotifications.sort((a, b) => b['publishDate'].compareTo(a['publishDate']));
+
+    // get the recent 10 notifications
+    List<dynamic> recentNotifications = courseNotifications.take(10).toList();
+
+    for (int i = 0; i < recentNotifications.length; i++) {
+      Map<String, dynamic> notification = recentNotifications[i];
+
+      if (notification.containsKey('dueDate')) {
+        // this is an assignment
+        courseNotificationsToDisplay.add(
+          ReusableWidgets.assignmentNotificationCard(
+            context,
+            notification['title'],
+            notification['content'],
+            notification['courseID'],
+            notification['dueDate'],
+            notification['publishDate'],
+          ),
+        );
+      } else {
+        // this is an announcement
+        courseNotificationsToDisplay.add(
+          ReusableWidgets.announcementNotificationCard(
+            context,
+            notification['title'],
+            notification['content'],
+            notification['courseID'],
+            notification['publishDate'],
+          ),
+        );
+      }
+    }
+  }
+
   Future<List<dynamic>> getAnnouncements() async {
     String parCourseID = widget.courseID;
     String parSectionID = widget.courseSectionID;
@@ -61,16 +106,6 @@ class _CoursePageState extends State<CoursePage> {
     if (response.statusCode == 200) {
       courseAnnouncements = json.decode(response.body);
       courseAnnouncements = courseAnnouncements.reversed.toList();
-
-      for (int i = 0; i < courseAnnouncements.length; i++) {
-        courseNotifications.add(ReusableWidgets.announcementNotificationCard(
-            context,
-            courseAnnouncements[i]['title'],
-            courseAnnouncements[i]['content'],
-            widget.courseID,
-            widget.courseName,
-            courseAnnouncements[i]['publishDate']));
-      }
 
       return courseAnnouncements;
     } else {
@@ -89,17 +124,6 @@ class _CoursePageState extends State<CoursePage> {
     if (response.statusCode == 200) {
       courseAssignments = json.decode(response.body);
       courseAssignments = courseAssignments.reversed.toList();
-
-      for (int i = 0; i < courseAssignments.length; i++) {
-        courseNotifications.add(ReusableWidgets.assignmentNotificationCard(
-          context,
-          courseAssignments[i]['title'],
-          courseAssignments[i]['content'],
-          widget.courseID,
-          widget.courseName,
-          courseAssignments[i]['dueDate'],
-        ));
-      }
 
       return courseAssignments;
     } else {
@@ -512,8 +536,7 @@ class _CoursePageState extends State<CoursePage> {
                             ),
                           ),
                           FutureBuilder(
-                            future: Future.wait(
-                                [getAnnouncements(), getAssignments()]),
+                            future: formNotifications(),
                             builder: (context, AsyncSnapshot<void> snapshot) {
                               if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
@@ -527,8 +550,15 @@ class _CoursePageState extends State<CoursePage> {
                                       color: ReusableMethods.colorDark,
                                     ),
                                   );
-                                default:
-                                  return CarouselSlider(
+                                default: return
+                                  courseNotificationsToDisplay.isEmpty
+                                      ? Image.asset(
+                                    'assets/images/no_notifications.png',
+                                    width: double.infinity,
+                                    fit: BoxFit.fill,
+                                  )
+                                      :
+                                  CarouselSlider(
                                     options: CarouselOptions(
                                       autoPlay: true,
                                       aspectRatio: 2.1,
@@ -536,7 +566,7 @@ class _CoursePageState extends State<CoursePage> {
                                       enableInfiniteScroll: false,
                                       initialPage: 0,
                                     ),
-                                    items: courseNotifications,
+                                    items: courseNotificationsToDisplay,
                                   );
                               }
                             },
