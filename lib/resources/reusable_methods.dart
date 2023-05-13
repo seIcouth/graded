@@ -23,6 +23,8 @@ class ReusableMethods {
   static Color colorAnnouncement2 = const Color(0xff1BFFFF).withOpacity(0.4);
   static Color colorAssignment1 = const Color(0xffFF5F6D);
   static Color colorAssignment2 = const Color(0xffFFC371);
+  static Color colorGrade1 = const Color(0xff11998E);
+  static Color colorGrade2 = const Color(0xff38EF7D);
   /*
     > announcements : #2E3192 → #1BFFFF
     > assignments : #FF5F6D -> #FFC371

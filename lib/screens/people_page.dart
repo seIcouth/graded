@@ -422,6 +422,13 @@ class _PeoplePageState extends State<PeoplePage> {
                                       ),
                                     ),
                                   ),
+                                  students.isEmpty
+                                      ?
+                                  Image.asset(
+                                    'assets/images/no_students.png',
+                                    width: double.infinity,
+                                    fit: BoxFit.fill,
+                                  ) :
                                   ListView.builder(
                                     shrinkWrap: true,
                                     physics:

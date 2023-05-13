@@ -8,6 +8,7 @@ import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:graded/screens/announcement_page.dart';
 import 'package:graded/screens/assignment_page.dart';
 import 'package:graded/screens/course_page.dart';
+import 'package:graded/screens/grade_page.dart';
 import 'package:graded/screens/people_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:graded/resources/reusable_methods.dart';
@@ -829,7 +830,18 @@ class _HomePageState extends State<HomePage> {
                             tooltip: "people",
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => GradePage(
+                                    courseID: courseID,
+                                    sectionID: sectionID,
+                                    semester: semester,
+                                    year: year,
+                                  ),
+                                ),
+                              );
+                            },
                             icon: Icon(
                               CupertinoIcons.chart_bar_alt_fill,
                               color: ReusableMethods.colorGrades,

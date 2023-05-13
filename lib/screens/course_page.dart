@@ -9,6 +9,7 @@ import 'package:graded/screens/people_page.dart';
 import '../resources/reusable_methods.dart';
 import '../resources/reusable_widgets.dart';
 import 'package:http/http.dart' as http;
+import 'grade_page.dart';
 
 class CoursePage extends StatefulWidget {
   const CoursePage({
@@ -624,7 +625,18 @@ class _CoursePageState extends State<CoursePage> {
                 ),
               ),
             );
-          } else {}
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => GradePage(
+                  courseID: widget.courseID,
+                  sectionID: widget.courseSectionID,
+                  semester: widget.courseSemester,
+                  year: widget.courseYear,
+                ),
+              ),
+            );
+          }
         },
         child: Container(
           width: (MediaQuery.of(context).size.width - 56) / 2,
