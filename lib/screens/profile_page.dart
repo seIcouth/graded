@@ -473,9 +473,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     'Logout',
                     style: TextStyle(

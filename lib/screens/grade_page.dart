@@ -6,7 +6,13 @@ import '../resources/reusable_methods.dart';
 import 'package:http/http.dart' as http;
 
 class GradePage extends StatefulWidget {
-  const GradePage({Key? key, required this.courseID, required this.sectionID, required this.semester, required this.year}) : super(key: key);
+  const GradePage(
+      {Key? key,
+      required this.courseID,
+      required this.sectionID,
+      required this.semester,
+      required this.year})
+      : super(key: key);
 
   // parameters
   final String courseID;
@@ -24,6 +30,9 @@ class _GradePageState extends State<GradePage> {
 
   late List<dynamic> people;
   List<dynamic> students = [];
+
+  late double classAverage;
+  late String studentGrade;
 
   // dropdown menu list
   List<String> grades = [
@@ -57,6 +66,67 @@ class _GradePageState extends State<GradePage> {
     } else {
       throw Exception('Failed to load students');
     }
+  }
+
+  Future<String> getStudentGrade() async {
+    final students = await getStudents();
+    int? id = await ReusableMethods.getUserId();
+    studentGrade = 'a';
+    for (final student in students) {
+      if (student['id'] == id.toString()) {
+        studentGrade = student['grade'];
+      }
+    }
+    return studentGrade;
+  }
+
+  Future<double> getClassAverageGrade() async {
+    final students = await getStudents();
+    double sum = 0;
+    int count = 0;
+    for (final student in students) {
+      final grade = student['grade'];
+      if (grade != 'NA') {
+        switch (grade) {
+          case 'A':
+            sum += 4.0;
+            break;
+          case 'A-':
+            sum += 3.7;
+            break;
+          case 'B+':
+            sum += 3.3;
+            break;
+          case 'B':
+            sum += 3.0;
+            break;
+          case 'B-':
+            sum += 2.7;
+            break;
+          case 'C+':
+            sum += 2.3;
+            break;
+          case 'C':
+            sum += 2.0;
+            break;
+          case 'C-':
+            sum += 1.7;
+            break;
+          case 'D+':
+            sum += 1.3;
+            break;
+          case 'D':
+            sum += 1.0;
+            break;
+          default:
+            sum += 0.0;
+            break;
+        }
+        count++;
+      }
+    }
+    classAverage = count > 0 ? sum / count : 0.0;
+    return classAverage;
   }
 
   Future<String> getRole() async {
@@ -155,7 +225,12 @@ class _GradePageState extends State<GradePage> {
       backgroundColor: ReusableMethods.colorLight,
       extendBodyBehindAppBar: true,
       body: FutureBuilder(
-        future: Future.wait([getRole(), getStudents()]),
+        future: Future.wait([
+          getRole(),
+          getStudents(),
+          getClassAverageGrade(),
+          getStudentGrade()
+        ]),
         builder: (context, AsyncSnapshot<void> snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -169,300 +244,926 @@ class _GradePageState extends State<GradePage> {
                 ),
               );
             default:
-              return role == 'Instructor' ? SafeArea(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: students.isEmpty
-                          ?
-                      Image.asset(
-                        'assets/images/no_students.png',
-                        width: double.infinity,
-                        fit: BoxFit.fill,
-                      ) :Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        color: ReusableMethods.colorLight,
-                        elevation: 3.0,
-                        shadowColor: ReusableMethods.colorGrade1,
-                        child: Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(20)),
-                                color: ReusableMethods.colorLight,
-                                elevation: 2.0,
-                                shadowColor: ReusableMethods.colorGrade1,
-                                child: Container(
-                                  margin: const EdgeInsets.all(5.0),
-                                  width: double.infinity,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+              return role == 'Instructor'
+                  ? SafeArea(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: students.isEmpty
+                                ? Image.asset(
+                                    'assets/images/no_students.png',
+                                    width: double.infinity,
+                                    fit: BoxFit.fill,
+                                  )
+                                : Column(
+                                    children: [
+                                      classAverageCard(),
+                                      Card(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        color: ReusableMethods.colorLight,
+                                        elevation: 3.0,
+                                        shadowColor:
+                                            ReusableMethods.colorGrade1,
+                                        child: Container(
+                                          width: double.infinity,
+                                          margin: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: [
+                                              Card(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20)),
+                                                color:
+                                                    ReusableMethods.colorLight,
+                                                elevation: 2.0,
+                                                shadowColor:
+                                                    ReusableMethods.colorGrade1,
+                                                child: Container(
+                                                  margin:
+                                                      const EdgeInsets.all(5.0),
+                                                  width: double.infinity,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                width: 2.0,
+                                                                color: ReusableMethods
+                                                                    .colorDark),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0),
+                                                            gradient:
+                                                                LinearGradient(
+                                                              begin: Alignment
+                                                                  .topRight,
+                                                              end: Alignment
+                                                                  .bottomLeft,
+                                                              stops: const [
+                                                                0.1,
+                                                                0.9,
+                                                              ],
+                                                              colors: [
+                                                                ReusableMethods
+                                                                    .colorGrade2,
+                                                                ReusableMethods
+                                                                    .colorGrade1,
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0),
+                                                            child: Image.asset(
+                                                              'assets/images/student.png',
+                                                              width: 512 / 8,
+                                                              height: 512 / 8,
+                                                              fit: BoxFit.fill,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const Spacer(),
+                                                        Expanded(
+                                                          child: Text(
+                                                            "Students",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  ReusableMethods
+                                                                      .colorDark,
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w900,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const Spacer(),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: students.length,
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  return Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 3),
+                                                    child: Card(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20)),
+                                                      color: ReusableMethods
+                                                          .colorLight,
+                                                      elevation: 2.0,
+                                                      shadowColor:
+                                                          ReusableMethods
+                                                              .colorGrade1,
+                                                      child: Container(
+                                                        margin: const EdgeInsets
+                                                            .all(8.0),
+                                                        width: double.infinity,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 16,
+                                                                ),
+                                                                ShaderMask(
+                                                                  blendMode:
+                                                                      BlendMode
+                                                                          .srcIn,
+                                                                  shaderCallback: (Rect
+                                                                          bounds) =>
+                                                                      RadialGradient(
+                                                                    center: Alignment
+                                                                        .topCenter,
+                                                                    stops: const [
+                                                                      .9,
+                                                                      1
+                                                                    ],
+                                                                    colors: [
+                                                                      ReusableMethods
+                                                                          .colorGrade1,
+                                                                      ReusableMethods
+                                                                          .colorGrade2,
+                                                                    ],
+                                                                  ).createShader(
+                                                                          bounds),
+                                                                  child: Icon(
+                                                                      CupertinoIcons
+                                                                          .person_solid,
+                                                                      size: 36,
+                                                                      color: ReusableMethods
+                                                                          .colorGrades),
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 48,
+                                                                ),
+                                                                Text(
+                                                                  "${students[index]['name']} ${students[index]['surname']}",
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          17,
+                                                                      color: CupertinoColors
+                                                                          .systemGrey),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 8.0,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 16,
+                                                                ),
+                                                                ShaderMask(
+                                                                  blendMode:
+                                                                      BlendMode
+                                                                          .srcIn,
+                                                                  shaderCallback: (Rect
+                                                                          bounds) =>
+                                                                      RadialGradient(
+                                                                    center: Alignment
+                                                                        .topCenter,
+                                                                    stops: const [
+                                                                      .9,
+                                                                      1
+                                                                    ],
+                                                                    colors: [
+                                                                      ReusableMethods
+                                                                          .colorGrade1,
+                                                                      ReusableMethods
+                                                                          .colorGrade2,
+                                                                    ],
+                                                                  ).createShader(
+                                                                          bounds),
+                                                                  child: Icon(
+                                                                      CupertinoIcons
+                                                                          .mail_solid,
+                                                                      size: 36,
+                                                                      color: ReusableMethods
+                                                                          .colorGrades),
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 48,
+                                                                ),
+                                                                Text(
+                                                                  students[
+                                                                          index]
+                                                                      ['mail'],
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          17,
+                                                                      color: CupertinoColors
+                                                                          .systemGrey),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 8.0,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 16,
+                                                                ),
+                                                                ShaderMask(
+                                                                  blendMode:
+                                                                      BlendMode
+                                                                          .srcIn,
+                                                                  shaderCallback: (Rect
+                                                                          bounds) =>
+                                                                      RadialGradient(
+                                                                    center: Alignment
+                                                                        .topCenter,
+                                                                    stops: const [
+                                                                      .9,
+                                                                      1
+                                                                    ],
+                                                                    colors: [
+                                                                      ReusableMethods
+                                                                          .colorGrade1,
+                                                                      ReusableMethods
+                                                                          .colorGrade2,
+                                                                    ],
+                                                                  ).createShader(
+                                                                          bounds),
+                                                                  child: Icon(
+                                                                      CupertinoIcons
+                                                                          .chart_bar_alt_fill,
+                                                                      size: 36,
+                                                                      color: ReusableMethods
+                                                                          .colorGrades),
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 48,
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 100,
+                                                                    child: DropdownButtonFormField(
+                                                                        dropdownColor: ReusableMethods.colorLight,
+                                                                        borderRadius: BorderRadius.circular(20),
+                                                                        decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(width: 1, color: ReusableMethods.colorDark))),
+                                                                        value: students[index]['grade'],
+                                                                        items: grades
+                                                                            .map((item) => DropdownMenuItem(
+                                                                                value: item,
+                                                                                child: Text(
+                                                                                  item,
+                                                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: CupertinoColors.systemGrey),
+                                                                                )))
+                                                                            .toList(),
+                                                                        onChanged: (item) async {
+                                                                          setState(
+                                                                              () {
+                                                                            updateTakes(students[index]['id'],
+                                                                                item! as String);
+                                                                          });
+                                                                        })),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      classAverageInfoCard(),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : SafeArea(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                classAverageCard(),
+                                Card(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  color: ReusableMethods.colorLight,
+                                  elevation: 3.0,
+                                  shadowColor: ReusableMethods.colorGrade1,
+                                  child: Container(
+                                    width: double.infinity,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 12.0),
+                                    child: Column(
                                       children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                width: 2.0,
-                                                color: ReusableMethods
-                                                    .colorDark),
-                                            borderRadius:
-                                            BorderRadius.circular(20.0),
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topRight,
-                                              end: Alignment.bottomLeft,
-                                              stops: const [
-                                                0.1,
-                                                0.9,
-                                              ],
-                                              colors: [
-                                                ReusableMethods
-                                                    .colorGrade2,
-                                                ReusableMethods
-                                                    .colorGrade1,
-                                              ],
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                            BorderRadius.circular(20.0),
-                                            child: Image.asset(
-                                              'assets/images/student.png',
-                                              width: 512 / 8,
-                                              height: 512 / 8,
-                                              fit: BoxFit.fill,
+                                        Card(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          color: ReusableMethods.colorLight,
+                                          elevation: 2.0,
+                                          shadowColor:
+                                              ReusableMethods.colorGrade1,
+                                          child: Container(
+                                            margin: const EdgeInsets.all(5.0),
+                                            width: double.infinity,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5.0),
+                                              child: Center(
+                                                child: Text(
+                                                  "Your Grade",
+                                                  style: TextStyle(
+                                                    color: ReusableMethods
+                                                        .colorDark,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                        const Spacer(),
-                                        Expanded(
-                                          child: Text(
-                                            "Students",
-                                            style: TextStyle(
-                                              color:
-                                              ReusableMethods.colorDark,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w900,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Card(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              color: ReusableMethods.colorLight,
+                                              elevation: 2.0,
+                                              shadowColor:
+                                                  ReusableMethods.colorGrade1,
+                                              child: Container(
+                                                margin:
+                                                    const EdgeInsets.all(5.0),
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width -
+                                                    58,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(5.0),
+                                                  child: Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          ShaderMask(
+                                                            blendMode:
+                                                                BlendMode.srcIn,
+                                                            shaderCallback: (Rect
+                                                                    bounds) =>
+                                                                RadialGradient(
+                                                              center: Alignment
+                                                                  .topCenter,
+                                                              stops: const [
+                                                                .9,
+                                                                1
+                                                              ],
+                                                              colors: [
+                                                                ReusableMethods
+                                                                    .colorGrade1,
+                                                                ReusableMethods
+                                                                    .colorGrade2,
+                                                              ],
+                                                            ).createShader(
+                                                                    bounds),
+                                                            child: Icon(
+                                                                CupertinoIcons
+                                                                    .chart_bar_alt_fill,
+                                                                size: 36,
+                                                                color: ReusableMethods
+                                                                    .colorGrades),
+                                                          ),
+                                                          const Spacer(),
+                                                          Expanded(
+                                                            child: Text(
+                                                              studentGrade,
+                                                              style: TextStyle(
+                                                                  color: ReusableMethods
+                                                                      .colorDark,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                          ),
+                                                          const Spacer(),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        const Spacer(),
                                       ],
                                     ),
                                   ),
                                 ),
-                              ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics:
-                                const NeverScrollableScrollPhysics(),
-                                itemCount: students.length,
-                                itemBuilder:
-                                    (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 3),
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(20)),
-                                      color: ReusableMethods.colorLight,
-                                      elevation: 2.0,
-                                      shadowColor:
-                                      ReusableMethods.colorGrade1,
-                                      child: Container(
-                                        margin: const EdgeInsets.all(8.0),
-                                        width: double.infinity,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                              children: [
-                                                const SizedBox(
-                                                  width: 16,
-                                                ),
-                                                ShaderMask(
-                                                  blendMode:
-                                                  BlendMode.srcIn,
-                                                  shaderCallback:
-                                                      (Rect bounds) =>
-                                                      RadialGradient(
-                                                        center:
-                                                        Alignment.topCenter,
-                                                        stops: const [.9, 1],
-                                                        colors: [
-                                                          ReusableMethods
-                                                              .colorGrade1,
-                                                          ReusableMethods
-                                                              .colorGrade2,
-                                                        ],
-                                                      ).createShader(bounds),
-                                                  child: Icon(
-                                                      CupertinoIcons
-                                                          .person_solid,
-                                                      size: 36,
-                                                      color: ReusableMethods
-                                                          .colorGrades),
-                                                ),
-                                                const SizedBox(
-                                                  width: 48,
-                                                ),
-                                                Text(
-                                                  "${students[index]['name']} ${students[index]['surname']}",
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.bold,
-                                                      fontSize: 17,
-                                                      color: CupertinoColors
-                                                          .systemGrey),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 8.0,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                              children: [
-                                                const SizedBox(
-                                                  width: 16,
-                                                ),
-                                                ShaderMask(
-                                                  blendMode:
-                                                  BlendMode.srcIn,
-                                                  shaderCallback:
-                                                      (Rect bounds) =>
-                                                      RadialGradient(
-                                                        center:
-                                                        Alignment.topCenter,
-                                                        stops: const [.9, 1],
-                                                        colors: [
-                                                          ReusableMethods
-                                                              .colorGrade1,
-                                                          ReusableMethods
-                                                              .colorGrade2,
-                                                        ],
-                                                      ).createShader(bounds),
-                                                  child: Icon(
-                                                      CupertinoIcons
-                                                          .mail_solid,
-                                                      size: 36,
-                                                      color: ReusableMethods
-                                                          .colorGrades),
-                                                ),
-                                                const SizedBox(
-                                                  width: 48,
-                                                ),
-                                                Text(
-                                                  students[index]['mail'],
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                      FontWeight.bold,
-                                                      fontSize: 17,
-                                                      color: CupertinoColors
-                                                          .systemGrey),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 8.0,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                              children: [
-                                                const SizedBox(
-                                                  width: 16,
-                                                ),
-                                                ShaderMask(
-                                                  blendMode:
-                                                  BlendMode.srcIn,
-                                                  shaderCallback:
-                                                      (Rect bounds) =>
-                                                      RadialGradient(
-                                                        center:
-                                                        Alignment.topCenter,
-                                                        stops: const [.9, 1],
-                                                        colors: [
-                                                          ReusableMethods
-                                                              .colorGrade1,
-                                                          ReusableMethods
-                                                              .colorGrade2,
-                                                        ],
-                                                      ).createShader(bounds),
-                                                  child: Icon(
-                                                      CupertinoIcons.chart_bar_alt_fill,
-                                                      size: 36,
-                                                      color: ReusableMethods
-                                                          .colorGrades),
-                                                ),
-                                                const SizedBox(
-                                                  width: 48,
-                                                ),
-                                                SizedBox(
-                                                  width: 100,
-                                                    child: DropdownButtonFormField(
-                                                        dropdownColor: ReusableMethods.colorLight,
-                                                        borderRadius: BorderRadius.circular(20),
-                                                        decoration: InputDecoration(
-                                                            border: OutlineInputBorder(
-                                                                borderRadius: BorderRadius.circular(20),
-                                                                borderSide: BorderSide(width: 1, color: ReusableMethods.colorDark)
-                                                            )
-                                                        ),
-                                                        value: students[index]['grade'],
-                                                        items: grades.map((item) => DropdownMenuItem(
-                                                            value: item,
-                                                            child: Text(
-                                                              item,
-                                                              style: const TextStyle(
-                                                                  fontWeight:
-                                                                  FontWeight.bold,
-                                                                  fontSize: 17,
-                                                                  color: CupertinoColors.systemGrey
-                                                              ),
-                                                            )
-                                                        )).toList(),
-                                                        onChanged: (item) async {
-                                                          setState(() {
-                                                            updateTakes(students[index]['id'], item! as String);
-                                                          });
-                                                        }
-                                                    )
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                                classAverageInfoCard(),
+                              ],
+                            ),
                           ),
                         ),
+                      ),
+                    );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget classAverageCard() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: ReusableMethods.colorLight,
+      elevation: 3.0,
+      shadowColor: ReusableMethods.colorGrade1,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+        child: Column(
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              color: ReusableMethods.colorLight,
+              elevation: 2.0,
+              shadowColor: ReusableMethods.colorGrade1,
+              child: Container(
+                margin: const EdgeInsets.all(5.0),
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Center(
+                    child: Text(
+                      "Class Average",
+                      style: TextStyle(
+                        color: ReusableMethods.colorDark,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
                 ),
-              )
-                :
-              Container()
-              ;
-          }
-        },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  color: ReusableMethods.colorLight,
+                  elevation: 2.0,
+                  shadowColor: ReusableMethods.colorGrade1,
+                  child: Container(
+                    margin: const EdgeInsets.all(5.0),
+                    width: MediaQuery.of(context).size.width - 58,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ShaderMask(
+                                blendMode: BlendMode.srcIn,
+                                shaderCallback: (Rect bounds) => RadialGradient(
+                                  center: Alignment.topCenter,
+                                  stops: const [.9, 1],
+                                  colors: [
+                                    ReusableMethods.colorGrade1,
+                                    ReusableMethods.colorGrade2,
+                                  ],
+                                ).createShader(bounds),
+                                child: Icon(CupertinoIcons.chart_bar_alt_fill,
+                                    size: 36,
+                                    color: ReusableMethods.colorGrades),
+                              ),
+                              const Spacer(),
+                              Expanded(
+                                child: Text(
+                                  '$classAverage',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              const Spacer(),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget classAverageInfoCard() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: ReusableMethods.colorLight,
+      elevation: 3.0,
+      shadowColor: ReusableMethods.colorGrade1,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+        child: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                color: ReusableMethods.colorLight,
+                elevation: 2.0,
+                shadowColor: ReusableMethods.colorGrade1,
+                child: Container(
+                  margin: const EdgeInsets.all(5.0),
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ShaderMask(
+                          blendMode: BlendMode.srcIn,
+                          shaderCallback: (Rect bounds) => RadialGradient(
+                            center: Alignment.topCenter,
+                            stops: const [.9, 1],
+                            colors: [
+                              ReusableMethods.colorGrade1,
+                              ReusableMethods.colorGrade2,
+                            ],
+                          ).createShader(bounds),
+                          child: Icon(CupertinoIcons.info,
+                              size: 36, color: ReusableMethods.colorGrades),
+                        ),
+                        Text(
+                          "Grading Table",
+                          style: TextStyle(
+                            color: ReusableMethods.colorDark,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    color: ReusableMethods.colorLight,
+                    elevation: 2.0,
+                    shadowColor: ReusableMethods.colorGrade1,
+                    child: Container(
+                      margin: const EdgeInsets.all(5.0),
+                      width: MediaQuery.of(context).size.width / 2 - 46,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'A',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '4.0',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'A-',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '3.7',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'B+',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '3.3',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'B',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '3.0',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'B-',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '2.7',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'C+',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '2.3',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    color: ReusableMethods.colorLight,
+                    elevation: 2.0,
+                    shadowColor: ReusableMethods.colorGrade1,
+                    child: Container(
+                      margin: const EdgeInsets.all(5.0),
+                      width: MediaQuery.of(context).size.width / 2 - 46,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'C',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '2.0',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'C-',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '1.7',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'D+',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '1.3',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'D',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '1.0',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'F',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '0.0',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  'NA',
+                                  style: TextStyle(
+                                    color: ReusableMethods.colorDark,
+                                    fontSize: 17,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '0.0',
+                                  style: TextStyle(
+                                      color: ReusableMethods.colorDark,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
