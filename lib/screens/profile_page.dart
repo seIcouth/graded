@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:graded/screens/auth_screens/change_password.dart';
 import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 import '../resources/reusable_methods.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late String deptName;
   late String role;
   late String mail;
+  late String password;
 
   Future<void> getUserInfo() async {
     int? id = await ReusableMethods.getUserId();
@@ -49,6 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
       deptName = user['deptName'];
       role = user['role'] == 'student' ? 'Student' : 'Instructor';
       mail = user['mail'];
+      password = user['password'];
 
       //print("$name - $surname - $deptName - $role - $mail");
     } else {
@@ -122,12 +125,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               );
             default:
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  buildTop(),
-                  buildContent(),
-                ],
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    buildTop(),
+                    buildContent(),
+                  ],
+                ),
               );
           }
         },
@@ -389,6 +394,59 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(
             height: 36.0,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ForgotPasswordScreen(currentPassword: password,),
+                ),
+              );
+            },
+            style: ButtonStyle(
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+              backgroundColor:
+              MaterialStateProperty.all<Color>(Colors.transparent),
+              // Set overlayColor to Colors.transparent to remove the purple shadow
+              overlayColor:
+              MaterialStateProperty.all<Color>(Colors.transparent),
+              elevation: MaterialStateProperty.all<double>(0),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    ReusableMethods.colorProfile1,
+                    ReusableMethods.colorProfile2,
+                    ReusableMethods.colorProfile3,
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Change password',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 16.0,
           ),
           ElevatedButton(
             onPressed: () {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:graded/screens/auth_screens/change_password.dart';
 import 'package:graded/screens/auth_screens/register.dart';
 import 'package:http/http.dart' as http;
 import '../../hidden_drawer.dart';
@@ -145,10 +146,11 @@ class _LoginPageState extends State<LoginPage> {
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
                         onTap: () {
-                          //TODO: Forgot password screen implementation
-                          /*
-                          Navigator.push(context, MaterialPageRoute(builder: (context){}));
-                           */
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ForgotPasswordScreen(),
+                            ),
+                          );
                         },
                         child: const Text('Forgot password?',
                             style: TextStyle(
