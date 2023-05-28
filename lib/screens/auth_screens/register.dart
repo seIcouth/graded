@@ -1,11 +1,10 @@
-// ignore_for_file: avoid_print
-
+// ignore_for_file: avoid_print, use_build_context_synchronously
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flushbar/flutter_flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:graded/hidden_drawer.dart';
 import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:graded/screens/auth_screens/login.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,16 +23,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  //final role = TextEditingController();
+
+  // variables
   bool isStudent = true;
   bool isClicked = false;
 
+  // methods
   @override
   void dispose() {
     mailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
-    //role.dispose();
     super.dispose();
   }
 
@@ -67,7 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -87,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: ReusableMethods.colorDark,
+                        color: ReusableWidgets.colorDark,
                       ),
                     ),
                   ),
@@ -98,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xfff5f5f5),
                       border: Border.all(
-                        color: ReusableMethods.colorDark,
+                        color: ReusableWidgets.colorDark,
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
@@ -114,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: ReusableMethods.colorDark,
+                                color: ReusableWidgets.colorDark,
                               ),
                             ),
                             const SizedBox(
@@ -136,7 +136,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           ? MaterialStateProperty.all(
                                               const Color(0xff808080))
                                           : MaterialStateProperty.all(
-                                              ReusableMethods.colorDark),
+                                              ReusableWidgets.colorDark),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -177,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           ? MaterialStateProperty.all(
                                               const Color(0xff808080))
                                           : MaterialStateProperty.all(
-                                              ReusableMethods.colorDark),
+                                              ReusableWidgets.colorDark),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -217,7 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: TextField(
                           cursorHeight: 16,
                           cursorWidth: 1.5,
-                          cursorColor: ReusableMethods.colorDark,
+                          cursorColor: ReusableWidgets.colorDark,
                           controller: nameController,
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
@@ -226,7 +226,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide:
-                                  BorderSide(color: ReusableMethods.colorDark),
+                                  BorderSide(color: ReusableWidgets.colorDark),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             hintText: 'Name',
@@ -242,7 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: TextField(
                           cursorHeight: 16,
                           cursorWidth: 1.5,
-                          cursorColor: ReusableMethods.colorDark,
+                          cursorColor: ReusableWidgets.colorDark,
                           controller: surnameController,
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
@@ -251,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide:
-                                  BorderSide(color: ReusableMethods.colorDark),
+                                  BorderSide(color: ReusableWidgets.colorDark),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             hintText: 'Surname',
@@ -268,7 +268,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
+                    cursorColor: ReusableWidgets.colorDark,
                     controller: deptName,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -277,7 +277,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
+                            BorderSide(color: ReusableWidgets.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Department',
@@ -291,7 +291,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
+                    cursorColor: ReusableWidgets.colorDark,
                     controller: mailController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -300,7 +300,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
+                            BorderSide(color: ReusableWidgets.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
@@ -315,7 +315,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
+                    cursorColor: ReusableWidgets.colorDark,
                     controller: passwordController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -324,7 +324,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
+                            BorderSide(color: ReusableWidgets.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Password',
@@ -339,7 +339,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
+                    cursorColor: ReusableWidgets.colorDark,
                     controller: confirmPasswordController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -348,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
+                            BorderSide(color: ReusableWidgets.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Confirm password',
@@ -364,37 +364,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (mailController.text.isEmpty ||
                           passwordController.text.isEmpty ||
                           confirmPasswordController.text.isEmpty) {
-                        Flushbar(
-                          message: "Please fill all necessary fields.",
-                          duration: const Duration(seconds: 3),
-                          margin: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom +
-                                  50),
-                        ).show(context);
+                        ReusableWidgets.flushbar(
+                            "Please fill all necessary fields", context);
                       } else if (!isClicked) {
-                        Flushbar(
-                          message: "Please select a role.",
-                          duration: const Duration(seconds: 3),
-                          margin: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom +
-                                  50),
-                        ).show(context);
+                        ReusableWidgets.flushbar(
+                            "Please select a role", context);
                       } else {
                         if (ReusableMethods.isValidEmail(mailController.text)) {
                           if (!passwordConfirmed()) {
-                            Flushbar(
-                              message: "Given passwords do not match!",
-                              duration: const Duration(seconds: 3),
-                              margin: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom +
-                                          50),
-                            ).show(context);
+                            ReusableWidgets.flushbar(
+                                "Given passwords do not match!", context);
                           } else {
                             if (passwordController.text.length > 5) {
                               try {
                                 await register();
-                                // ignore: use_build_context_synchronously
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => const HiddenDrawer(),
@@ -404,27 +387,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 print(e);
                               }
                             } else {
-                              Flushbar(
-                                message:
-                                    "The password should be at least 6 characters.",
-                                duration: const Duration(seconds: 3),
-                                margin: EdgeInsets.only(
-                                    bottom: MediaQuery.of(context)
-                                            .viewInsets
-                                            .bottom +
-                                        50),
-                              ).show(context);
+                              ReusableWidgets.flushbar(
+                                  "The password should be at least 6 characters",
+                                  context);
                             }
                           }
                         } else {
-                          Flushbar(
-                            message: "The email address is badly formatted.",
-                            duration: const Duration(seconds: 3),
-                            margin: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom +
-                                        50),
-                          ).show(context);
+                          ReusableWidgets.flushbar(
+                              "The email address is badly formatted", context);
                         }
                       }
                     },
@@ -434,7 +404,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12.0),
                       )),
                       backgroundColor:
-                          MaterialStateProperty.all(ReusableMethods.colorDark),
+                          MaterialStateProperty.all(ReusableWidgets.colorDark),
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(20),

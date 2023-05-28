@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:graded/resources/reusable_widgets.dart';
-import '../resources/reusable_methods.dart';
 import 'package:http/http.dart' as http;
 
-class AssignmentPage extends StatefulWidget {
-  const AssignmentPage(
+class AnnouncementPage extends StatefulWidget {
+  const AnnouncementPage(
       {Key? key,
       required this.courseID,
       required this.courseSectionID,
@@ -21,29 +20,29 @@ class AssignmentPage extends StatefulWidget {
   final String courseYear;
 
   @override
-  State<AssignmentPage> createState() => _AssignmentPageState();
+  State<AnnouncementPage> createState() => _AnnouncementPageState();
 }
 
-class _AssignmentPageState extends State<AssignmentPage> {
+class _AnnouncementPageState extends State<AnnouncementPage> {
   // variables
-  late List<dynamic> courseAssignments;
+  late List<dynamic> courseAnnouncements;
 
   // accessor methods
-  Future<List<dynamic>> getAssignments() async {
+  Future<List<dynamic>> getAnnouncements() async {
     String parCourseID = widget.courseID;
     String parSectionID = widget.courseSectionID;
     String parSemester = widget.courseSemester;
     String parYear = widget.courseYear;
     final url =
-        'http://10.0.2.2/graded/getassignments.php?courseID=$parCourseID&sectionID=$parSectionID&semester=$parSemester&year=$parYear';
+        'http://10.0.2.2/graded/getannouncements.php?courseID=$parCourseID&sectionID=$parSectionID&semester=$parSemester&year=$parYear';
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      courseAssignments = json.decode(response.body);
-      courseAssignments = courseAssignments.reversed.toList();
+      courseAnnouncements = json.decode(response.body);
+      courseAnnouncements = courseAnnouncements.reversed.toList();
 
-      return courseAssignments;
+      return courseAnnouncements;
     } else {
-      throw Exception('Failed to load assignments');
+      throw Exception('Failed to load announcements');
     }
   }
 
@@ -51,11 +50,11 @@ class _AssignmentPageState extends State<AssignmentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ReusableMethods.colorPeople,
+        backgroundColor: ReusableWidgets.colorPeople,
         title: Text(
-          "Assignments",
+          "Announcements",
           style: TextStyle(
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -69,17 +68,17 @@ class _AssignmentPageState extends State<AssignmentPage> {
                 0.9,
               ],
               colors: [
-                ReusableMethods.colorAssignment2,
-                ReusableMethods.colorAssignment1,
+                ReusableWidgets.colorAnnouncement2,
+                ReusableWidgets.colorAnnouncement1,
               ],
             ),
           ),
         ),
       ),
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       extendBodyBehindAppBar: true,
       body: FutureBuilder(
-        future: getAssignments(),
+        future: getAnnouncements(),
         builder: (context, AsyncSnapshot<void> snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -87,10 +86,8 @@ class _AssignmentPageState extends State<AssignmentPage> {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
               return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: ReusableMethods.colorLight,
-                  color: ReusableMethods.colorDark,
-                ),
+                child: ReusableWidgets.loadingAnimation(
+                    ReusableWidgets.colorAnnouncement),
               );
             default:
               return SafeArea(
@@ -101,16 +98,16 @@ class _AssignmentPageState extends State<AssignmentPage> {
                       child: Card(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        color: ReusableMethods.colorLight,
+                        color: ReusableWidgets.colorLight,
                         elevation: 3.0,
-                        shadowColor: ReusableMethods.colorAssignment1,
+                        shadowColor: ReusableWidgets.colorAnnouncement1,
                         child: Container(
                           width: double.infinity,
                           margin: const EdgeInsets.all(8.0),
-                          child: courseAssignments.isEmpty
-                              ? noAssignment()
+                          child: courseAnnouncements.isEmpty
+                              ? noAnnouncement()
                               : ListView.builder(
-                                  itemCount: courseAssignments.length,
+                                  itemCount: courseAnnouncements.length,
                                   shrinkWrap: true,
                                   padding: const EdgeInsets.all(4.0),
                                   physics: const NeverScrollableScrollPhysics(),
@@ -119,15 +116,17 @@ class _AssignmentPageState extends State<AssignmentPage> {
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 4.0),
-                                      child: ReusableWidgets.assignmentPageCard(
-                                          context,
-                                          courseAssignments[index]['title'],
-                                          courseAssignments[index]['content'],
-                                          widget.courseID,
-                                          widget.courseName,
-                                          courseAssignments[index]
-                                              ['publishDate'],
-                                          courseAssignments[index]['dueDate']),
+                                      child:
+                                          ReusableWidgets.announcementPageCard(
+                                              context,
+                                              courseAnnouncements[index]
+                                                  ['title'],
+                                              courseAnnouncements[index]
+                                                  ['content'],
+                                              widget.courseID,
+                                              widget.courseName,
+                                              courseAnnouncements[index]
+                                                  ['publishDate']),
                                     );
                                   },
                                 ),
@@ -143,20 +142,20 @@ class _AssignmentPageState extends State<AssignmentPage> {
     );
   }
 
-  Widget noAssignment() {
+  Widget noAnnouncement() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
           Icon(
-            Icons.assignment_outlined,
-            color: ReusableMethods.colorAssignment,
+            Icons.announcement_rounded,
+            color: ReusableWidgets.colorAnnouncement,
             size: 70,
           ),
           Text(
-            'There is no assignment published yet.',
+            'There is no announcement published yet.',
             style: TextStyle(
-              color: ReusableMethods.colorAssignment,
+              color: ReusableWidgets.colorAnnouncement,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

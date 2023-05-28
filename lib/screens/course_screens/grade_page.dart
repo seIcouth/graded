@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../resources/reusable_methods.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class GradePage extends StatefulWidget {
   const GradePage(
@@ -197,11 +199,11 @@ class _GradePageState extends State<GradePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ReusableMethods.colorGrades,
+        backgroundColor: ReusableWidgets.colorGrades,
         title: Text(
           "Grades",
           style: TextStyle(
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -215,14 +217,14 @@ class _GradePageState extends State<GradePage> {
                 0.9,
               ],
               colors: [
-                ReusableMethods.colorGrade2,
-                ReusableMethods.colorGrade1,
+                ReusableWidgets.colorGrade2,
+                ReusableWidgets.colorGrade1,
               ],
             ),
           ),
         ),
       ),
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       extendBodyBehindAppBar: true,
       body: FutureBuilder(
         future: Future.wait([
@@ -238,10 +240,8 @@ class _GradePageState extends State<GradePage> {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
               return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: ReusableMethods.colorLight,
-                  color: ReusableMethods.colorDark,
-                ),
+                child: LoadingAnimationWidget.newtonCradle(
+                    color: ReusableWidgets.colorGrades, size: 125),
               );
             default:
               return role == 'Instructor'
@@ -263,10 +263,10 @@ class _GradePageState extends State<GradePage> {
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(20)),
-                                        color: ReusableMethods.colorLight,
+                                        color: ReusableWidgets.colorLight,
                                         elevation: 3.0,
                                         shadowColor:
-                                            ReusableMethods.colorGrade1,
+                                            ReusableWidgets.colorGrade1,
                                         child: Container(
                                           width: double.infinity,
                                           margin: const EdgeInsets.all(8.0),
@@ -278,10 +278,10 @@ class _GradePageState extends State<GradePage> {
                                                         BorderRadius.circular(
                                                             20)),
                                                 color:
-                                                    ReusableMethods.colorLight,
+                                                    ReusableWidgets.colorLight,
                                                 elevation: 2.0,
                                                 shadowColor:
-                                                    ReusableMethods.colorGrade1,
+                                                    ReusableWidgets.colorGrade1,
                                                 child: Container(
                                                   margin:
                                                       const EdgeInsets.all(5.0),
@@ -300,7 +300,7 @@ class _GradePageState extends State<GradePage> {
                                                               BoxDecoration(
                                                             border: Border.all(
                                                                 width: 2.0,
-                                                                color: ReusableMethods
+                                                                color: ReusableWidgets
                                                                     .colorDark),
                                                             borderRadius:
                                                                 BorderRadius
@@ -317,9 +317,9 @@ class _GradePageState extends State<GradePage> {
                                                                 0.9,
                                                               ],
                                                               colors: [
-                                                                ReusableMethods
+                                                                ReusableWidgets
                                                                     .colorGrade2,
-                                                                ReusableMethods
+                                                                ReusableWidgets
                                                                     .colorGrade1,
                                                               ],
                                                             ),
@@ -343,7 +343,7 @@ class _GradePageState extends State<GradePage> {
                                                             "Students",
                                                             style: TextStyle(
                                                               color:
-                                                                  ReusableMethods
+                                                                  ReusableWidgets
                                                                       .colorDark,
                                                               fontSize: 20,
                                                               fontWeight:
@@ -376,11 +376,11 @@ class _GradePageState extends State<GradePage> {
                                                                   BorderRadius
                                                                       .circular(
                                                                           20)),
-                                                      color: ReusableMethods
+                                                      color: ReusableWidgets
                                                           .colorLight,
                                                       elevation: 2.0,
                                                       shadowColor:
-                                                          ReusableMethods
+                                                          ReusableWidgets
                                                               .colorGrade1,
                                                       child: Container(
                                                         margin: const EdgeInsets
@@ -413,9 +413,9 @@ class _GradePageState extends State<GradePage> {
                                                                       1
                                                                     ],
                                                                     colors: [
-                                                                      ReusableMethods
+                                                                      ReusableWidgets
                                                                           .colorGrade1,
-                                                                      ReusableMethods
+                                                                      ReusableWidgets
                                                                           .colorGrade2,
                                                                     ],
                                                                   ).createShader(
@@ -424,7 +424,7 @@ class _GradePageState extends State<GradePage> {
                                                                       CupertinoIcons
                                                                           .person_solid,
                                                                       size: 36,
-                                                                      color: ReusableMethods
+                                                                      color: ReusableWidgets
                                                                           .colorGrades),
                                                                 ),
                                                                 const SizedBox(
@@ -468,9 +468,9 @@ class _GradePageState extends State<GradePage> {
                                                                       1
                                                                     ],
                                                                     colors: [
-                                                                      ReusableMethods
+                                                                      ReusableWidgets
                                                                           .colorGrade1,
-                                                                      ReusableMethods
+                                                                      ReusableWidgets
                                                                           .colorGrade2,
                                                                     ],
                                                                   ).createShader(
@@ -479,7 +479,7 @@ class _GradePageState extends State<GradePage> {
                                                                       CupertinoIcons
                                                                           .mail_solid,
                                                                       size: 36,
-                                                                      color: ReusableMethods
+                                                                      color: ReusableWidgets
                                                                           .colorGrades),
                                                                 ),
                                                                 const SizedBox(
@@ -525,9 +525,9 @@ class _GradePageState extends State<GradePage> {
                                                                       1
                                                                     ],
                                                                     colors: [
-                                                                      ReusableMethods
+                                                                      ReusableWidgets
                                                                           .colorGrade1,
-                                                                      ReusableMethods
+                                                                      ReusableWidgets
                                                                           .colorGrade2,
                                                                     ],
                                                                   ).createShader(
@@ -536,7 +536,7 @@ class _GradePageState extends State<GradePage> {
                                                                       CupertinoIcons
                                                                           .chart_bar_alt_fill,
                                                                       size: 36,
-                                                                      color: ReusableMethods
+                                                                      color: ReusableWidgets
                                                                           .colorGrades),
                                                                 ),
                                                                 const SizedBox(
@@ -545,9 +545,9 @@ class _GradePageState extends State<GradePage> {
                                                                 SizedBox(
                                                                     width: 100,
                                                                     child: DropdownButtonFormField(
-                                                                        dropdownColor: ReusableMethods.colorLight,
+                                                                        dropdownColor: ReusableWidgets.colorLight,
                                                                         borderRadius: BorderRadius.circular(20),
-                                                                        decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(width: 1, color: ReusableMethods.colorDark))),
+                                                                        decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide(width: 1, color: ReusableWidgets.colorDark))),
                                                                         value: students[index]['grade'],
                                                                         items: grades
                                                                             .map((item) => DropdownMenuItem(
@@ -595,9 +595,9 @@ class _GradePageState extends State<GradePage> {
                                 Card(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20)),
-                                  color: ReusableMethods.colorLight,
+                                  color: ReusableWidgets.colorLight,
                                   elevation: 3.0,
-                                  shadowColor: ReusableMethods.colorGrade1,
+                                  shadowColor: ReusableWidgets.colorGrade1,
                                   child: Container(
                                     width: double.infinity,
                                     margin: const EdgeInsets.symmetric(
@@ -608,10 +608,10 @@ class _GradePageState extends State<GradePage> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20)),
-                                          color: ReusableMethods.colorLight,
+                                          color: ReusableWidgets.colorLight,
                                           elevation: 2.0,
                                           shadowColor:
-                                              ReusableMethods.colorGrade1,
+                                              ReusableWidgets.colorGrade1,
                                           child: Container(
                                             margin: const EdgeInsets.all(5.0),
                                             width: double.infinity,
@@ -622,7 +622,7 @@ class _GradePageState extends State<GradePage> {
                                                 child: Text(
                                                   "Your Grade",
                                                   style: TextStyle(
-                                                    color: ReusableMethods
+                                                    color: ReusableWidgets
                                                         .colorDark,
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.w900,
@@ -642,10 +642,10 @@ class _GradePageState extends State<GradePage> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           20)),
-                                              color: ReusableMethods.colorLight,
+                                              color: ReusableWidgets.colorLight,
                                               elevation: 2.0,
                                               shadowColor:
-                                                  ReusableMethods.colorGrade1,
+                                                  ReusableWidgets.colorGrade1,
                                               child: Container(
                                                 margin:
                                                     const EdgeInsets.all(5.0),
@@ -676,9 +676,9 @@ class _GradePageState extends State<GradePage> {
                                                                 1
                                                               ],
                                                               colors: [
-                                                                ReusableMethods
+                                                                ReusableWidgets
                                                                     .colorGrade1,
-                                                                ReusableMethods
+                                                                ReusableWidgets
                                                                     .colorGrade2,
                                                               ],
                                                             ).createShader(
@@ -687,7 +687,7 @@ class _GradePageState extends State<GradePage> {
                                                                 CupertinoIcons
                                                                     .chart_bar_alt_fill,
                                                                 size: 36,
-                                                                color: ReusableMethods
+                                                                color: ReusableWidgets
                                                                     .colorGrades),
                                                           ),
                                                           const Spacer(),
@@ -695,7 +695,7 @@ class _GradePageState extends State<GradePage> {
                                                             child: Text(
                                                               studentGrade,
                                                               style: TextStyle(
-                                                                  color: ReusableMethods
+                                                                  color: ReusableWidgets
                                                                       .colorDark,
                                                                   fontSize: 20,
                                                                   fontWeight:
@@ -733,9 +733,9 @@ class _GradePageState extends State<GradePage> {
   Widget classAverageCard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: ReusableMethods.colorLight,
+      color: ReusableWidgets.colorLight,
       elevation: 3.0,
-      shadowColor: ReusableMethods.colorGrade1,
+      shadowColor: ReusableWidgets.colorGrade1,
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
@@ -744,9 +744,9 @@ class _GradePageState extends State<GradePage> {
             Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
-              color: ReusableMethods.colorLight,
+              color: ReusableWidgets.colorLight,
               elevation: 2.0,
-              shadowColor: ReusableMethods.colorGrade1,
+              shadowColor: ReusableWidgets.colorGrade1,
               child: Container(
                 margin: const EdgeInsets.all(5.0),
                 width: double.infinity,
@@ -756,7 +756,7 @@ class _GradePageState extends State<GradePage> {
                     child: Text(
                       "Class Average",
                       style: TextStyle(
-                        color: ReusableMethods.colorDark,
+                        color: ReusableWidgets.colorDark,
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                       ),
@@ -772,9 +772,9 @@ class _GradePageState extends State<GradePage> {
                 Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
-                  color: ReusableMethods.colorLight,
+                  color: ReusableWidgets.colorLight,
                   elevation: 2.0,
-                  shadowColor: ReusableMethods.colorGrade1,
+                  shadowColor: ReusableWidgets.colorGrade1,
                   child: Container(
                     margin: const EdgeInsets.all(5.0),
                     width: MediaQuery.of(context).size.width - 58,
@@ -791,20 +791,20 @@ class _GradePageState extends State<GradePage> {
                                   center: Alignment.topCenter,
                                   stops: const [.9, 1],
                                   colors: [
-                                    ReusableMethods.colorGrade1,
-                                    ReusableMethods.colorGrade2,
+                                    ReusableWidgets.colorGrade1,
+                                    ReusableWidgets.colorGrade2,
                                   ],
                                 ).createShader(bounds),
                                 child: Icon(CupertinoIcons.chart_bar_alt_fill,
                                     size: 36,
-                                    color: ReusableMethods.colorGrades),
+                                    color: ReusableWidgets.colorGrades),
                               ),
                               const Spacer(),
                               Expanded(
                                 child: Text(
                                   '$classAverage',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -828,9 +828,9 @@ class _GradePageState extends State<GradePage> {
   Widget classAverageInfoCard() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: ReusableMethods.colorLight,
+      color: ReusableWidgets.colorLight,
       elevation: 3.0,
-      shadowColor: ReusableMethods.colorGrade1,
+      shadowColor: ReusableWidgets.colorGrade1,
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
@@ -842,9 +842,9 @@ class _GradePageState extends State<GradePage> {
               Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
-                color: ReusableMethods.colorLight,
+                color: ReusableWidgets.colorLight,
                 elevation: 2.0,
-                shadowColor: ReusableMethods.colorGrade1,
+                shadowColor: ReusableWidgets.colorGrade1,
                 child: Container(
                   margin: const EdgeInsets.all(5.0),
                   width: double.infinity,
@@ -859,17 +859,17 @@ class _GradePageState extends State<GradePage> {
                             center: Alignment.topCenter,
                             stops: const [.9, 1],
                             colors: [
-                              ReusableMethods.colorGrade1,
-                              ReusableMethods.colorGrade2,
+                              ReusableWidgets.colorGrade1,
+                              ReusableWidgets.colorGrade2,
                             ],
                           ).createShader(bounds),
                           child: Icon(CupertinoIcons.info,
-                              size: 36, color: ReusableMethods.colorGrades),
+                              size: 36, color: ReusableWidgets.colorGrades),
                         ),
                         Text(
                           "Grading Table",
                           style: TextStyle(
-                            color: ReusableMethods.colorDark,
+                            color: ReusableWidgets.colorDark,
                             fontSize: 20,
                             fontWeight: FontWeight.w900,
                           ),
@@ -886,9 +886,9 @@ class _GradePageState extends State<GradePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorGrade1,
+                    shadowColor: ReusableWidgets.colorGrade1,
                     child: Container(
                       margin: const EdgeInsets.all(5.0),
                       width: MediaQuery.of(context).size.width / 2 - 46,
@@ -902,7 +902,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'A',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -910,7 +910,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '4.0',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -922,7 +922,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'A-',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -930,7 +930,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '3.7',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -942,7 +942,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'B+',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -950,7 +950,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '3.3',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -962,7 +962,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'B',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -970,7 +970,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '3.0',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -982,7 +982,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'B-',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -990,7 +990,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '2.7',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1002,7 +1002,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'C+',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1010,7 +1010,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '2.3',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1024,9 +1024,9 @@ class _GradePageState extends State<GradePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorGrade1,
+                    shadowColor: ReusableWidgets.colorGrade1,
                     child: Container(
                       margin: const EdgeInsets.all(5.0),
                       width: MediaQuery.of(context).size.width / 2 - 46,
@@ -1040,7 +1040,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'C',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1048,7 +1048,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '2.0',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1060,7 +1060,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'C-',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1068,7 +1068,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '1.7',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1080,7 +1080,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'D+',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1088,7 +1088,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '1.3',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1100,7 +1100,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'D',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1108,7 +1108,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '1.0',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1120,7 +1120,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'F',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1128,7 +1128,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '0.0',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -1140,7 +1140,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   'NA',
                                   style: TextStyle(
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                     fontSize: 17,
                                   ),
                                 ),
@@ -1148,7 +1148,7 @@ class _GradePageState extends State<GradePage> {
                                 Text(
                                   '0.0',
                                   style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
                                 ),

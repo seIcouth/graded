@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:graded/screens/announcement_page.dart';
-import 'package:graded/screens/assignment_page.dart';
-import 'package:graded/screens/people_page.dart';
-import '../resources/reusable_methods.dart';
-import '../resources/reusable_widgets.dart';
+import 'package:graded/screens/course_screens/announcement_page.dart';
+import 'package:graded/screens/course_screens/assignment_page.dart';
+import 'package:graded/screens/course_screens/people_page.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'grade_page.dart';
 
@@ -41,7 +41,6 @@ class CoursePage extends StatefulWidget {
 }
 
 class _CoursePageState extends State<CoursePage> {
-
   late List<dynamic> courseAnnouncements;
   late List<dynamic> courseAssignments;
   // dummy list (will change)
@@ -49,7 +48,7 @@ class _CoursePageState extends State<CoursePage> {
   List<dynamic> courseNotifications = [];
 
   // accessor methods
-  Future<void> formNotifications() async{
+  Future<void> formNotifications() async {
     courseNotifications = [];
     courseNotificationsToDisplay = [];
 
@@ -61,7 +60,8 @@ class _CoursePageState extends State<CoursePage> {
     courseNotifications.addAll(assignments);
 
     // sort the notifications based on the publish date
-    courseNotifications.sort((a, b) => b['publishDate'].compareTo(a['publishDate']));
+    courseNotifications
+        .sort((a, b) => b['publishDate'].compareTo(a['publishDate']));
 
     // get the recent 10 notifications
     List<dynamic> recentNotifications = courseNotifications.take(10).toList();
@@ -134,18 +134,13 @@ class _CoursePageState extends State<CoursePage> {
 
   @override
   Widget build(BuildContext context) {
-    /*
-      courseNotifications.add(ReusableWidgets.assignmentNotificationCard(context, s.title,
-          s.content, s.courseCode, s.courseName, s.dueDate));
-     */
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ReusableMethods.colorPeople,
+        backgroundColor: ReusableWidgets.colorPeople,
         title: Text(
           widget.courseName.toUpperCase(),
           style: TextStyle(
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -156,15 +151,15 @@ class _CoursePageState extends State<CoursePage> {
               end: Alignment.bottomLeft,
               stops: const [0.1, 0.5, 0.9],
               colors: [
-                ReusableMethods.colorCourse3,
-                ReusableMethods.colorCourse2,
-                ReusableMethods.colorCourse1,
+                ReusableWidgets.colorCourse3,
+                ReusableWidgets.colorCourse2,
+                ReusableWidgets.colorCourse1,
               ],
             ),
           ),
         ),
       ),
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -176,9 +171,9 @@ class _CoursePageState extends State<CoursePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorDark,
+                    shadowColor: ReusableWidgets.colorDark,
                     child: Container(
                       width: double.infinity,
                       margin: const EdgeInsets.all(8.0),
@@ -193,7 +188,7 @@ class _CoursePageState extends State<CoursePage> {
                                   Icon(
                                     CupertinoIcons.info,
                                     size: 30,
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                   const SizedBox(
                                     width: 8,
@@ -201,7 +196,7 @@ class _CoursePageState extends State<CoursePage> {
                                   Text(
                                     " Course Information",
                                     style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -216,9 +211,9 @@ class _CoursePageState extends State<CoursePage> {
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
-                              color: ReusableMethods.colorLight,
+                              color: ReusableWidgets.colorLight,
                               elevation: 2.0,
-                              shadowColor: ReusableMethods.colorPeople1,
+                              shadowColor: ReusableWidgets.colorPeople1,
                               child: Container(
                                 margin: const EdgeInsets.all(8.0),
                                 width: double.infinity,
@@ -242,7 +237,7 @@ class _CoursePageState extends State<CoursePage> {
                                       child: Text(
                                         widget.courseName.toUpperCase(),
                                         style: TextStyle(
-                                          color: ReusableMethods.colorCourse1,
+                                          color: ReusableWidgets.colorCourse1,
                                           fontSize: 20,
                                           fontWeight: FontWeight.w900,
                                         ),
@@ -281,8 +276,8 @@ class _CoursePageState extends State<CoursePage> {
                                             center: Alignment.topCenter,
                                             stops: const [.9, 1],
                                             colors: [
-                                              ReusableMethods.colorCourse2,
-                                              ReusableMethods.colorCourse3,
+                                              ReusableWidgets.colorCourse2,
+                                              ReusableWidgets.colorCourse3,
                                             ],
                                           ).createShader(bounds),
                                           child: const Icon(
@@ -324,8 +319,8 @@ class _CoursePageState extends State<CoursePage> {
                                             center: Alignment.topCenter,
                                             stops: const [.9, 1],
                                             colors: [
-                                              ReusableMethods.colorCourse2,
-                                              ReusableMethods.colorCourse3,
+                                              ReusableWidgets.colorCourse2,
+                                              ReusableWidgets.colorCourse3,
                                             ],
                                           ).createShader(bounds),
                                           child: const Icon(
@@ -367,8 +362,8 @@ class _CoursePageState extends State<CoursePage> {
                                             center: Alignment.topCenter,
                                             stops: const [.9, 1],
                                             colors: [
-                                              ReusableMethods.colorCourse2,
-                                              ReusableMethods.colorCourse3,
+                                              ReusableWidgets.colorCourse2,
+                                              ReusableWidgets.colorCourse3,
                                             ],
                                           ).createShader(bounds),
                                           child: const Icon(
@@ -406,8 +401,8 @@ class _CoursePageState extends State<CoursePage> {
                                             center: Alignment.topCenter,
                                             stops: const [.9, 1],
                                             colors: [
-                                              ReusableMethods.colorCourse2,
-                                              ReusableMethods.colorCourse3,
+                                              ReusableWidgets.colorCourse2,
+                                              ReusableWidgets.colorCourse3,
                                             ],
                                           ).createShader(bounds),
                                           child: const Icon(
@@ -443,9 +438,9 @@ class _CoursePageState extends State<CoursePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorDark,
+                    shadowColor: ReusableWidgets.colorDark,
                     child: Container(
                       width: double.infinity,
                       margin: const EdgeInsets.all(4.0),
@@ -460,14 +455,14 @@ class _CoursePageState extends State<CoursePage> {
                                     buttonContainer(
                                         Icons.announcement_rounded,
                                         'Announcements',
-                                        ReusableMethods.colorAnnouncement),
+                                        ReusableWidgets.colorAnnouncement),
                                     const SizedBox(
                                       width: 8,
                                     ),
                                     buttonContainer(
                                       Icons.assignment_outlined,
                                       'Assignments',
-                                      ReusableMethods.colorAssignment,
+                                      ReusableWidgets.colorAssignment,
                                     ),
                                   ],
                                 ),
@@ -476,7 +471,7 @@ class _CoursePageState extends State<CoursePage> {
                                     buttonContainer(
                                       CupertinoIcons.person_2_fill,
                                       'People',
-                                      ReusableMethods.colorPeople,
+                                      ReusableWidgets.colorPeople,
                                     ),
                                     const SizedBox(
                                       width: 8,
@@ -484,7 +479,7 @@ class _CoursePageState extends State<CoursePage> {
                                     buttonContainer(
                                       CupertinoIcons.chart_bar_alt_fill,
                                       'Grades',
-                                      ReusableMethods.colorGrades,
+                                      ReusableWidgets.colorGrades,
                                     ),
                                   ],
                                 ),
@@ -501,9 +496,9 @@ class _CoursePageState extends State<CoursePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorDark,
+                    shadowColor: ReusableWidgets.colorDark,
                     child: Container(
                       width: double.infinity,
                       margin: const EdgeInsets.all(8.0),
@@ -518,7 +513,7 @@ class _CoursePageState extends State<CoursePage> {
                                   Icon(
                                     CupertinoIcons.bell,
                                     size: 30,
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                   const SizedBox(
                                     width: 8,
@@ -526,7 +521,7 @@ class _CoursePageState extends State<CoursePage> {
                                   Text(
                                     " Recently on ${widget.courseID}",
                                     style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -545,30 +540,27 @@ class _CoursePageState extends State<CoursePage> {
                               switch (snapshot.connectionState) {
                                 case ConnectionState.waiting:
                                   return Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor:
-                                          ReusableMethods.colorLight,
-                                      color: ReusableMethods.colorDark,
-                                    ),
+                                    child: LoadingAnimationWidget.newtonCradle(
+                                        color: ReusableWidgets.colorDark,
+                                        size: 125),
                                   );
-                                default: return
-                                  courseNotificationsToDisplay.isEmpty
+                                default:
+                                  return courseNotificationsToDisplay.isEmpty
                                       ? Image.asset(
-                                    'assets/images/no_notifications.png',
-                                    width: double.infinity,
-                                    fit: BoxFit.fill,
-                                  )
-                                      :
-                                  CarouselSlider(
-                                    options: CarouselOptions(
-                                      autoPlay: true,
-                                      aspectRatio: 2.1,
-                                      enlargeCenterPage: true,
-                                      enableInfiniteScroll: false,
-                                      initialPage: 0,
-                                    ),
-                                    items: courseNotificationsToDisplay,
-                                  );
+                                          'assets/images/no_notifications.png',
+                                          width: double.infinity,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : CarouselSlider(
+                                          options: CarouselOptions(
+                                            autoPlay: true,
+                                            aspectRatio: 2.1,
+                                            enlargeCenterPage: true,
+                                            enableInfiniteScroll: false,
+                                            initialPage: 0,
+                                          ),
+                                          items: courseNotificationsToDisplay,
+                                        );
                               }
                             },
                           ),
@@ -645,7 +637,7 @@ class _CoursePageState extends State<CoursePage> {
           child: Card(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             elevation: 2.0,
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12),

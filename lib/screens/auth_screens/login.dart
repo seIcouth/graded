@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_flushbar/flutter_flushbar.dart';
-import 'package:graded/screens/auth_screens/change_password.dart';
 import 'package:graded/screens/auth_screens/register.dart';
+import 'package:graded/screens/auth_screens/change_password.dart';
+import 'package:graded/hidden_drawer.dart';
+import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:http/http.dart' as http;
-import '../../hidden_drawer.dart';
-import '../../resources/reusable_methods.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: ReusableMethods.colorDark,
+                        color: ReusableWidgets.colorDark,
                       ),
                     ),
                   ),
@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextField(
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
+                    cursorColor: ReusableWidgets.colorDark,
                     controller: mail,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
+                            BorderSide(color: ReusableWidgets.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Email',
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: true,
                     cursorHeight: 16,
                     cursorWidth: 1.5,
-                    cursorColor: ReusableMethods.colorDark,
+                    cursorColor: ReusableWidgets.colorDark,
                     controller: pass,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: ReusableMethods.colorDark),
+                            BorderSide(color: ReusableWidgets.colorDark),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       hintText: 'Password',
@@ -148,7 +148,8 @@ class _LoginPageState extends State<LoginPage> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => ForgotPasswordScreen(),
+                              builder: (context) =>
+                                  const ForgotPasswordScreen(),
                             ),
                           );
                         },
@@ -167,37 +168,20 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (mail.text.isEmpty || pass.text.isEmpty) {
-                        Flushbar(
-                          message: "Please fill all necessary fields.",
-                          duration: const Duration(seconds: 3),
-                          margin: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom +
-                                  50),
-                        ).show(context);
+                        ReusableWidgets.flushbar(
+                            "Please fill all necessary fields", context);
                       } else {
                         if (ReusableMethods.isValidEmail(mail.text)) {
                           try {
                             await login();
                           } on FormatException {
-                            Flushbar(
-                              message:
-                                  "Something went wrong, please try again.",
-                              duration: const Duration(seconds: 3),
-                              margin: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom +
-                                          50),
-                            ).show(context);
+                            ReusableWidgets.flushbar(
+                                "Something went wrong, please try again",
+                                context);
                           }
                         } else {
-                          Flushbar(
-                            message: "The email address is badly formatted.",
-                            duration: const Duration(seconds: 3),
-                            margin: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(context).viewInsets.bottom +
-                                        50),
-                          ).show(context);
+                          ReusableWidgets.flushbar(
+                              "The email address is badly formatted", context);
                         }
                       }
                     },
@@ -207,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12.0),
                       )),
                       backgroundColor:
-                          MaterialStateProperty.all(ReusableMethods.colorDark),
+                          MaterialStateProperty.all(ReusableWidgets.colorDark),
                     ),
                     child: Container(
                       padding: const EdgeInsets.all(20),
@@ -235,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: ReusableMethods.colorDark,
+                        color: ReusableWidgets.colorDark,
                       ),
                     ),
                     GestureDetector(

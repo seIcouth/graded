@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:graded/screens/auth_screens/login.dart';
 import 'hidden_drawer.dart';
 
@@ -22,9 +23,9 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         colorScheme: ColorScheme.fromSwatch()
             .copyWith(
-              primary: ReusableMethods.colorDark,
+              primary: ReusableWidgets.colorDark,
             )
-            .copyWith(secondary: ReusableMethods.colorDark),
+            .copyWith(secondary: ReusableWidgets.colorDark),
       ),
       debugShowCheckedModeBanner: false,
       home: isLoggedIn ? const HiddenDrawer() : const LoginPage(),

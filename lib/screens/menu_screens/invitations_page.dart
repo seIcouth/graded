@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_print
-
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
-import '../resources/reusable_methods.dart';
 
 class InvitationsPage extends StatefulWidget {
   const InvitationsPage({super.key});
@@ -19,13 +19,13 @@ class _InvitationsPageState extends State<InvitationsPage> {
   final textStyleKey = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 18,
-    color: ReusableMethods.colorProfile1,
+    color: ReusableWidgets.colorProfile1,
   );
 
   final textStyleValue = TextStyle(
       fontWeight: FontWeight.w600,
       fontSize: 18,
-      color: ReusableMethods.colorProfile3_1);
+      color: ReusableWidgets.colorProfile3_1);
 
   // variables
   late String role;
@@ -144,7 +144,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
         leading: IconButton(
           icon: Icon(
             CupertinoIcons.bars,
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
           ),
           onPressed: () {
             SimpleHiddenDrawerController.of(context).open();
@@ -153,12 +153,12 @@ class _InvitationsPageState extends State<InvitationsPage> {
         title: Text(
           "Invitations",
           style: TextStyle(
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -176,10 +176,8 @@ class _InvitationsPageState extends State<InvitationsPage> {
                         return SizedBox(
                           height: MediaQuery.of(context).size.height,
                           child: Center(
-                            child: CircularProgressIndicator(
-                              backgroundColor: ReusableMethods.colorLight,
-                              color: ReusableMethods.colorDark,
-                            ),
+                            child: ReusableWidgets.loadingAnimation(
+                                ReusableWidgets.colorDark),
                           ),
                         );
                       default:
@@ -209,9 +207,9 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                             0.9,
                                           ],
                                           colors: [
-                                            ReusableMethods.colorProfile3_1,
-                                            ReusableMethods.colorProfile2_1,
-                                            ReusableMethods.colorProfile1,
+                                            ReusableWidgets.colorProfile3_1,
+                                            ReusableWidgets.colorProfile2_1,
+                                            ReusableWidgets.colorProfile1,
                                           ],
                                         ),
                                       ),
@@ -219,7 +217,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(20)),
-                                        color: ReusableMethods.colorLight,
+                                        color: ReusableWidgets.colorLight,
                                         elevation: 2.0,
                                         child: Container(
                                           margin: const EdgeInsets.all(8.0),
@@ -239,7 +237,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                 invitations[index]
                                                     ['courseName'],
                                                 style: TextStyle(
-                                                  color: ReusableMethods
+                                                  color: ReusableWidgets
                                                       .colorProfile2_1,
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.w900,
@@ -474,7 +472,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           ),
                                                           //Set the background color
                                                           backgroundColor:
-                                                              ReusableMethods
+                                                              ReusableWidgets
                                                                   .colorLight,
                                                           //Set the foreground (text + icon) color
                                                           foregroundColor:
@@ -550,7 +548,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                           ),
                                                           //Set the background color
                                                           backgroundColor:
-                                                              ReusableMethods
+                                                              ReusableWidgets
                                                                   .colorLight,
                                                           //Set the foreground (text + icon) color
                                                           foregroundColor:
@@ -596,7 +594,7 @@ class _InvitationsPageState extends State<InvitationsPage> {
                                                                   BorderRadius
                                                                       .circular(
                                                                           35)),
-                                                      color: ReusableMethods
+                                                      color: ReusableWidgets
                                                           .colorLight,
                                                       elevation:
                                                           2.0, //Button icon

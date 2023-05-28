@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
 import 'package:graded/screens/auth_screens/login.dart';
-import 'package:graded/screens/homepage.dart';
-import 'package:graded/screens/invitations_page.dart';
-import 'package:graded/screens/profile_page.dart';
+import 'package:graded/screens/menu_screens/homepage.dart';
+import 'package:graded/screens/menu_screens/profile_page.dart';
+import 'package:graded/screens/menu_screens/invitations_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
 
@@ -60,11 +60,11 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
     final textStyleDark = TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 18,
-        color: ReusableMethods.colorDark);
+        color: ReusableWidgets.colorDark);
     final textStyleLogOut = TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 18,
-        color: ReusableMethods.colorAssignment);
+        color: ReusableWidgets.colorAssignment);
 
     _pagesInstructor = [
       ScreenHiddenDrawer(
@@ -72,7 +72,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Home',
             baseStyle: textStyleDark,
             selectedStyle: textStyleDark,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
           ),
           const HomePage()),
       ScreenHiddenDrawer(
@@ -80,7 +80,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Profile',
             baseStyle: textStyleDark,
             selectedStyle: textStyleDark,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
           ),
           const ProfilePage()),
       ScreenHiddenDrawer(
@@ -88,7 +88,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Log out',
             baseStyle: textStyleLogOut,
             selectedStyle: textStyleLogOut,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
             onTap: () async {
               ReusableMethods.setLoggedInFalse();
               Navigator.of(context).push(
@@ -97,7 +97,9 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
                 ),
               );
             }),
-        const Center(child: CircularProgressIndicator()),
+        Center(
+          child: ReusableWidgets.loadingAnimation(ReusableWidgets.colorDark),
+        ),
       ),
     ];
 
@@ -107,7 +109,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Home',
             baseStyle: textStyleDark,
             selectedStyle: textStyleDark,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
           ),
           const HomePage()),
       ScreenHiddenDrawer(
@@ -115,7 +117,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Profile',
             baseStyle: textStyleDark,
             selectedStyle: textStyleDark,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
           ),
           const ProfilePage()),
       ScreenHiddenDrawer(
@@ -123,7 +125,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Invitations',
             baseStyle: textStyleDark,
             selectedStyle: textStyleDark,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
           ),
           const InvitationsPage()),
       ScreenHiddenDrawer(
@@ -131,7 +133,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
             name: 'Log out',
             baseStyle: textStyleLogOut,
             selectedStyle: textStyleLogOut,
-            colorLineSelected: ReusableMethods.colorDark,
+            colorLineSelected: ReusableWidgets.colorDark,
             onTap: () async {
               ReusableMethods.setLoggedInFalse();
               Navigator.of(context).push(
@@ -140,7 +142,9 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
                 ),
               );
             }),
-        const Center(child: CircularProgressIndicator()),
+        Center(
+          child: ReusableWidgets.loadingAnimation(ReusableWidgets.colorDark),
+        ),
       ),
     ];
   }
@@ -156,15 +160,13 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: ReusableMethods.colorLight,
-                color: ReusableMethods.colorDark,
-              ),
+              child:
+                  ReusableWidgets.loadingAnimation(ReusableWidgets.colorDark),
             );
           default:
             return HiddenDrawerMenu(
               disableAppBarDefault: true,
-              backgroundColorMenu: ReusableMethods.colorLight,
+              backgroundColorMenu: ReusableWidgets.colorLight,
               backgroundMenu: const DecorationImage(
                   image: AssetImage('assets/images/logo_straight.png'),
                   alignment: Alignment(-0.80, -0.75),
@@ -174,7 +176,7 @@ class _HiddenDrawerState extends State<HiddenDrawer> {
               initPositionSelected: 0,
               slidePercent: 60,
               styleAutoTittleName: TextStyle(
-                color: ReusableMethods.colorLight,
+                color: ReusableWidgets.colorLight,
                 fontWeight: FontWeight.bold,
               ),
             );

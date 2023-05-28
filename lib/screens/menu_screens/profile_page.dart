@@ -1,14 +1,13 @@
 // ignore_for_file: avoid_print
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:graded/screens/auth_screens/change_password.dart';
-import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
-import '../resources/reusable_methods.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'auth_screens/login.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:graded/resources/reusable_methods.dart';
+import 'package:graded/resources/reusable_widgets.dart';
+import 'package:graded/screens/auth_screens/login.dart';
+import 'package:graded/screens/auth_screens/change_password.dart';
+import 'package:http/http.dart' as http;
+import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -77,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
         leading: IconButton(
           icon: Icon(
             CupertinoIcons.bars,
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
           ),
           onPressed: () {
             SimpleHiddenDrawerController.of(context).open();
@@ -86,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Text(
           "Profile",
           style: TextStyle(
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -101,15 +100,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 0.9,
               ],
               colors: [
-                ReusableMethods.colorProfile3,
-                ReusableMethods.colorProfile2,
-                ReusableMethods.colorProfile1,
+                ReusableWidgets.colorProfile3,
+                ReusableWidgets.colorProfile2,
+                ReusableWidgets.colorProfile1,
               ],
             ),
           ),
         ),
       ),
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       body: FutureBuilder(
         future: getUserInfo(),
         builder: (context, AsyncSnapshot<void> snapshot) {
@@ -119,10 +118,8 @@ class _ProfilePageState extends State<ProfilePage> {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
               return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: ReusableMethods.colorLight,
-                  color: ReusableMethods.colorDark,
-                ),
+                child: ReusableWidgets.loadingAnimation(
+                    ReusableWidgets.colorProfile1),
               );
             default:
               return SingleChildScrollView(
@@ -142,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget buildProfileImage() => Container(
         decoration: BoxDecoration(
-          border: Border.all(width: 3.5, color: ReusableMethods.colorDark),
+          border: Border.all(width: 3.5, color: ReusableWidgets.colorDark),
           borderRadius: BorderRadius.circular(30.0),
           gradient: LinearGradient(
             begin: Alignment.topRight,
@@ -153,9 +150,9 @@ class _ProfilePageState extends State<ProfilePage> {
               0.9,
             ],
             colors: [
-              ReusableMethods.colorProfile3,
-              ReusableMethods.colorProfile2,
-              ReusableMethods.colorProfile1,
+              ReusableWidgets.colorProfile3,
+              ReusableWidgets.colorProfile2,
+              ReusableWidgets.colorProfile1,
             ],
           ),
         ),
@@ -190,9 +187,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 0.9,
               ],
               colors: [
-                ReusableMethods.colorProfile3,
-                ReusableMethods.colorProfile2,
-                ReusableMethods.colorProfile1,
+                ReusableWidgets.colorProfile3,
+                ReusableWidgets.colorProfile2,
+                ReusableWidgets.colorProfile1,
               ],
             ),
             borderRadius: BorderRadius.vertical(
@@ -228,14 +225,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   center: Alignment.topCenter,
                   stops: const [.9, 1],
                   colors: [
-                    ReusableMethods.colorProfile1,
-                    ReusableMethods.colorProfile2,
+                    ReusableWidgets.colorProfile1,
+                    ReusableWidgets.colorProfile2,
                   ],
                 ).createShader(bounds),
                 child: Icon(
                   CupertinoIcons.person_solid,
                   size: 36,
-                  color: ReusableMethods.colorPeople,
+                  color: ReusableWidgets.colorPeople,
                 ),
               ),
               const SizedBox(
@@ -275,12 +272,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   center: Alignment.topCenter,
                   stops: const [.9, 1],
                   colors: [
-                    ReusableMethods.colorProfile1,
-                    ReusableMethods.colorProfile2,
+                    ReusableWidgets.colorProfile1,
+                    ReusableWidgets.colorProfile2,
                   ],
                 ).createShader(bounds),
                 child: Icon(CupertinoIcons.briefcase_fill,
-                    size: 36, color: ReusableMethods.colorPeople),
+                    size: 36, color: ReusableWidgets.colorPeople),
               ),
               const SizedBox(
                 width: 48,
@@ -319,12 +316,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   center: Alignment.topCenter,
                   stops: const [.9, 1],
                   colors: [
-                    ReusableMethods.colorProfile1,
-                    ReusableMethods.colorProfile2,
+                    ReusableWidgets.colorProfile1,
+                    ReusableWidgets.colorProfile2,
                   ],
                 ).createShader(bounds),
                 child: Icon(CupertinoIcons.mail_solid,
-                    size: 36, color: ReusableMethods.colorPeople),
+                    size: 36, color: ReusableWidgets.colorPeople),
               ),
               const SizedBox(
                 width: 48,
@@ -363,12 +360,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   center: Alignment.topCenter,
                   stops: const [.9, 1],
                   colors: [
-                    ReusableMethods.colorProfile1,
-                    ReusableMethods.colorProfile2,
+                    ReusableWidgets.colorProfile1,
+                    ReusableWidgets.colorProfile2,
                   ],
                 ).createShader(bounds),
                 child: Icon(Icons.school_rounded,
-                    size: 36, color: ReusableMethods.colorPeople),
+                    size: 36, color: ReusableWidgets.colorPeople),
               ),
               const SizedBox(
                 width: 48,
@@ -399,7 +396,9 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ForgotPasswordScreen(currentPassword: password,),
+                  builder: (context) => ForgotPasswordScreen(
+                    currentPassword: password,
+                  ),
                 ),
               );
             },
@@ -410,10 +409,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               backgroundColor:
-              MaterialStateProperty.all<Color>(Colors.transparent),
+                  MaterialStateProperty.all<Color>(Colors.transparent),
               // Set overlayColor to Colors.transparent to remove the purple shadow
               overlayColor:
-              MaterialStateProperty.all<Color>(Colors.transparent),
+                  MaterialStateProperty.all<Color>(Colors.transparent),
               elevation: MaterialStateProperty.all<double>(0),
             ),
             child: Container(
@@ -421,9 +420,9 @@ class _ProfilePageState extends State<ProfilePage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    ReusableMethods.colorProfile1,
-                    ReusableMethods.colorProfile2,
-                    ReusableMethods.colorProfile3,
+                    ReusableWidgets.colorProfile1,
+                    ReusableWidgets.colorProfile2,
+                    ReusableWidgets.colorProfile3,
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -457,13 +456,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     actionsAlignment: MainAxisAlignment.center,
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                    backgroundColor: ReusableMethods.colorLight,
+                    backgroundColor: ReusableWidgets.colorLight,
                     contentTextStyle:
-                        TextStyle(color: ReusableMethods.colorDark),
+                        TextStyle(color: ReusableWidgets.colorDark),
                     title: Text(
                       'Warning',
                       style: TextStyle(
-                          color: ReusableMethods.colorDark,
+                          color: ReusableWidgets.colorDark,
                           fontWeight: FontWeight.bold),
                     ),
                     content: const Text('Are you sure you want to logout?'),
@@ -475,7 +474,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           'Cancel',
                           style: TextStyle(
-                              color: ReusableMethods.colorDark,
+                              color: ReusableWidgets.colorDark,
                               fontWeight: FontWeight.bold),
                         ),
                         onPressed: () => Navigator.of(context).pop(false),
@@ -484,11 +483,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         shape: const RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15.0))),
-                        color: ReusableMethods.colorProfile2,
+                        color: ReusableWidgets.colorProfile2,
                         child: Text(
                           'Logout',
                           style: TextStyle(
-                              color: ReusableMethods.colorLight,
+                              color: ReusableWidgets.colorLight,
                               fontWeight: FontWeight.bold),
                         ),
                         onPressed: () => Navigator.of(context).pop(true),
@@ -522,9 +521,9 @@ class _ProfilePageState extends State<ProfilePage> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    ReusableMethods.colorProfile1,
-                    ReusableMethods.colorProfile2,
-                    ReusableMethods.colorProfile3,
+                    ReusableWidgets.colorProfile1,
+                    ReusableWidgets.colorProfile2,
+                    ReusableWidgets.colorProfile3,
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,

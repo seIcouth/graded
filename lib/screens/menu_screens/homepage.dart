@@ -1,20 +1,19 @@
 // ignore_for_file: avoid_print
 // ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flushbar/flutter_flushbar.dart';
-import 'package:graded/screens/announcement_page.dart';
-import 'package:graded/screens/assignment_page.dart';
-import 'package:graded/screens/course_page.dart';
-import 'package:graded/screens/grade_page.dart';
-import 'package:graded/screens/people_page.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
 import 'package:graded/resources/reusable_methods.dart';
-import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
+import 'package:graded/resources/reusable_widgets.dart';
+import 'package:graded/screens/course_screens/grade_page.dart';
+import 'package:graded/screens/course_screens/course_page.dart';
+import 'package:graded/screens/course_screens/people_page.dart';
+import 'package:graded/screens/course_screens/assignment_page.dart';
+import 'package:graded/screens/course_screens/announcement_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import '../resources/reusable_widgets.dart';
+import 'package:hidden_drawer_menu/controllers/simple_hidden_drawer_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -34,17 +33,20 @@ class _HomePageState extends State<HomePage> {
   int year = 2020;
   String? studentMail;
   String inviteCourseID = 'Select a course';
+  String removeCourseID = 'Select a course';
+
   String? announcementTitle;
   String? announcementContent;
+
   String? assignmentTitle;
   String? assignmentContent;
   DateTime assignmentDueDate = DateTime.now();
   bool isDateSelected = false;
 
   late String role;
-
   late List<dynamic> courses;
   List<String> inviteCourses = ['Select a course'];
+  List<String> studentMails = [];
 
   // lists for dropdown buttons
   List<String> semesters = [
@@ -92,7 +94,6 @@ class _HomePageState extends State<HomePage> {
       role = user['role'] == 'student' ? 'Student' : 'Instructor';
 
       return role;
-      //print("$name - $surname - $deptName - $role - $mail");
     } else {
       // If the response is not successful
       print('Failed to get user info. Status code: ${response.statusCode}');
@@ -104,7 +105,7 @@ class _HomePageState extends State<HomePage> {
     int? id = await ReusableMethods.getUserId();
     await getRole();
 
-    // Construct the URL with the instructor ID
+    // Construct the URL with the user ID
     String url = role == 'Student'
         ? 'http://10.0.2.2/graded/getcoursesbystudentid.php?studentID=$id'
         : 'http://10.0.2.2/graded/getcoursesbyinstructorid.php?instructorID=$id';
@@ -122,13 +123,31 @@ class _HomePageState extends State<HomePage> {
         inviteCourses.add(courses[i]['courseID']);
       }
 
-      //print(courses);
       // Return the list of courses
       return courses;
     } else {
       // If the response is not successful
       print('Failed to get courses. Status code: ${response.statusCode}');
       return [];
+    }
+  }
+
+  Future<List<dynamic>> getStudentMails(String parCourseID, String parSectionID,
+      String parSemester, String parYear) async {
+    final url =
+        'http://10.0.2.2/graded/getpeople.php?courseID=$parCourseID&sectionID=$parSectionID&semester=$parSemester&year=$parYear';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      List<dynamic> people = json.decode(response.body);
+      for (var person in people) {
+        if (person['type'] == 'student') {
+          // Add the person to the students list
+          studentMails.add(person['mail']);
+        }
+      }
+      return Future.value(studentMails);
+    } else {
+      throw Exception('Failed to load student mails');
     }
   }
 
@@ -208,6 +227,8 @@ class _HomePageState extends State<HomePage> {
       String parSemester,
       int parYear) async {
     try {
+      await getStudentMails(
+          parCourseID, parSectionID, parSemester, parYear.toString());
       // Prepare the request body as a Map
       final requestBody = {
         'instructorID': parInstructorID.toString(),
@@ -234,6 +255,38 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       // Handle any errors locally
       print('Failed to send invite: $e');
+    }
+  }
+
+  Future<void> removeStudent(String parStudentEmail, String parCourseID,
+      String parSectionID, String parSemester, int parYear) async {
+    try {
+      // Prepare the request body as a Map
+      final requestBody = {
+        'studentEmail': parStudentEmail,
+        'courseID': parCourseID,
+        'sectionID': parSectionID,
+        'semester': parSemester,
+        'year': parYear.toString(),
+      };
+
+      // Send a POST request to the related file on server
+      final response = await http.post(
+        Uri.parse(
+            'http://10.0.2.2/graded/removestudent.php?studentEmail=$parStudentEmail&courseID=$parCourseID&sectionID=$parSectionID&semester=$parSemester&year=$parYear'),
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        // Student removed successfully
+        print('Student removed successfully');
+      } else {
+        // Handle any errors from the server
+        print('Failed to remove student: ${response.body}');
+      }
+    } catch (e) {
+      // Handle any errors locally
+      print('Failed to remove student: $e');
     }
   }
 
@@ -323,15 +376,20 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> courseNotifications = [];
   List<Widget> courseNotificationsToDisplay = [];
 
-  Future<void> formNotifications() async{
+  Future<void> formNotifications() async {
     await getCourses();
 
     courseNotifications = [];
     courseNotificationsToDisplay = [];
 
-    for(int i=0; i<courses.length; i++){
-      List<dynamic> announcements = await getAnnouncements(courses[i]['courseID'], courses[i]['sectionID'], courses[i]['semester'], courses[i]['year']);
-      List<dynamic> assignments = await getAssignments(courses[i]['courseID'], courses[i]['sectionID'], courses[i]['semester'], courses[i]['year']);
+    for (int i = 0; i < courses.length; i++) {
+      List<dynamic> announcements = await getAnnouncements(
+          courses[i]['courseID'],
+          courses[i]['sectionID'],
+          courses[i]['semester'],
+          courses[i]['year']);
+      List<dynamic> assignments = await getAssignments(courses[i]['courseID'],
+          courses[i]['sectionID'], courses[i]['semester'], courses[i]['year']);
 
       // merge the announcements and assignments into one list
       courseNotifications.addAll(announcements);
@@ -339,7 +397,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     // sort the notifications based on the publish date
-    courseNotifications.sort((a, b) => b['publishDate'].compareTo(a['publishDate']));
+    courseNotifications
+        .sort((a, b) => b['publishDate'].compareTo(a['publishDate']));
 
     // get the recent 10 notifications
     List<dynamic> recentNotifications = courseNotifications.take(10).toList();
@@ -351,13 +410,12 @@ class _HomePageState extends State<HomePage> {
         // this is an assignment
         courseNotificationsToDisplay.add(
           ReusableWidgets.assignmentNotificationCard(
-            context,
-            notification['title'],
-            notification['content'],
-            notification['courseID'],
-            notification['dueDate'],
-            notification['publishDate']
-          ),
+              context,
+              notification['title'],
+              notification['content'],
+              notification['courseID'],
+              notification['dueDate'],
+              notification['publishDate']),
         );
       } else {
         // this is an announcement
@@ -378,8 +436,7 @@ class _HomePageState extends State<HomePage> {
       String assignmentCourseID,
       String assignmentSectionID,
       String assignmentSemester,
-      String assignmentYear
-  ) async {
+      String assignmentYear) async {
     String parCourseID = assignmentCourseID;
     String parSectionID = assignmentSectionID;
     String parSemester = assignmentSemester;
@@ -401,8 +458,7 @@ class _HomePageState extends State<HomePage> {
       String announcementCourseID,
       String announcementSectionID,
       String announcementSemester,
-      String announcementYear
-  ) async {
+      String announcementYear) async {
     String parCourseID = announcementCourseID;
     String parSectionID = announcementSectionID;
     String parSemester = announcementSemester;
@@ -427,32 +483,32 @@ class _HomePageState extends State<HomePage> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
           child: Container(
-            color: ReusableMethods.colorDark,
+            color: ReusableWidgets.colorDark,
             height: 3.0,
           ),
         ),
-        backgroundColor: ReusableMethods.colorLight,
+        backgroundColor: ReusableWidgets.colorLight,
         leading: IconButton(
           icon: Icon(
             CupertinoIcons.bars,
-            color: ReusableMethods.colorDark,
+            color: ReusableWidgets.colorDark,
           ),
           onPressed: () {
             SimpleHiddenDrawerController.of(context).open();
           },
         ),
         centerTitle: true,
-        shadowColor: ReusableMethods.colorDark,
+        shadowColor: ReusableWidgets.colorDark,
         title: Text(
           "Home",
           style: TextStyle(
-            color: ReusableMethods.colorDark,
+            color: ReusableWidgets.colorDark,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
         ),
       ),
-      backgroundColor: ReusableMethods.colorLight,
+      backgroundColor: ReusableWidgets.colorLight,
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -464,9 +520,9 @@ class _HomePageState extends State<HomePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorDark,
+                    shadowColor: ReusableWidgets.colorDark,
                     child: Container(
                       width: double.infinity,
                       margin: const EdgeInsets.all(8.0),
@@ -481,7 +537,7 @@ class _HomePageState extends State<HomePage> {
                                   Icon(
                                     CupertinoIcons.bell,
                                     size: 30,
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                   const SizedBox(
                                     width: 8,
@@ -489,17 +545,11 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     " Recent Notifications",
                                     style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                     textAlign: TextAlign.left,
-                                  ),
-                                  const Spacer(),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(CupertinoIcons.forward),
-                                    color: ReusableMethods.colorDark,
                                   ),
                                 ],
                               ),
@@ -514,29 +564,26 @@ class _HomePageState extends State<HomePage> {
                               switch (snapshot.connectionState) {
                                 case ConnectionState.waiting:
                                   return Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: ReusableMethods.colorLight,
-                                      color: ReusableMethods.colorDark,
-                                    ),
+                                    child: ReusableWidgets.loadingAnimation(
+                                        ReusableWidgets.colorDark),
                                   );
-                                default: return
-                                  courseNotificationsToDisplay.isEmpty
+                                default:
+                                  return courseNotificationsToDisplay.isEmpty
                                       ? Image.asset(
-                                    'assets/images/no_notifications.png',
-                                    width: double.infinity,
-                                    fit: BoxFit.fill,
-                                  )
-                                      :
-                                   CarouselSlider(
-                                    options: CarouselOptions(
-                                      autoPlay: true,
-                                      aspectRatio: 2.1,
-                                      enlargeCenterPage: true,
-                                      enableInfiniteScroll: false,
-                                      initialPage: 0,
-                                    ),
-                                    items: courseNotificationsToDisplay,
-                                  );
+                                          'assets/images/no_notifications.png',
+                                          width: double.infinity,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : CarouselSlider(
+                                          options: CarouselOptions(
+                                            autoPlay: true,
+                                            aspectRatio: 2.1,
+                                            enlargeCenterPage: true,
+                                            enableInfiniteScroll: false,
+                                            initialPage: 0,
+                                          ),
+                                          items: courseNotificationsToDisplay,
+                                        );
                               }
                             },
                           ),
@@ -547,23 +594,26 @@ class _HomePageState extends State<HomePage> {
                   Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color: ReusableMethods.colorLight,
+                    color: ReusableWidgets.colorLight,
                     elevation: 2.0,
-                    shadowColor: ReusableMethods.colorDark,
+                    shadowColor: ReusableWidgets.colorDark,
                     child: Container(
                       width: double.infinity,
                       margin: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(5.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5.0,
+                              vertical: 8.0,
+                            ),
                             child: SizedBox(
                               width: double.infinity,
                               child: Row(
                                 children: [
                                   Icon(
                                     CupertinoIcons.collections,
-                                    color: ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                   const SizedBox(
                                     width: 8,
@@ -571,17 +621,11 @@ class _HomePageState extends State<HomePage> {
                                   Text(
                                     " Courses",
                                     style: TextStyle(
-                                      color: ReusableMethods.colorDark,
+                                      color: ReusableWidgets.colorDark,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                     textAlign: TextAlign.left,
-                                  ),
-                                  const Spacer(),
-                                  IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(CupertinoIcons.forward),
-                                    color: ReusableMethods.colorDark,
                                   ),
                                 ],
                               ),
@@ -596,11 +640,8 @@ class _HomePageState extends State<HomePage> {
                               switch (snapshot.connectionState) {
                                 case ConnectionState.waiting:
                                   return Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor:
-                                          ReusableMethods.colorLight,
-                                      color: ReusableMethods.colorDark,
-                                    ),
+                                    child: ReusableWidgets.loadingAnimation(
+                                        ReusableWidgets.colorDark),
                                   );
                                 default:
                                   return courses.isEmpty
@@ -657,10 +698,10 @@ class _HomePageState extends State<HomePage> {
               return Visibility(
                 visible: snapshot.data![0] == 'Instructor',
                 child: SpeedDial(
-                  icon: CupertinoIcons.add,
+                  icon: Icons.mode_edit_rounded,
                   activeIcon: CupertinoIcons.multiply,
-                  foregroundColor: ReusableMethods.colorLight,
-                  overlayColor: ReusableMethods.colorDark,
+                  foregroundColor: ReusableWidgets.colorLight,
+                  overlayColor: ReusableWidgets.colorDark,
                   overlayOpacity: 0.5,
                   children: speedDialChildren,
                 ),
@@ -715,17 +756,17 @@ class _HomePageState extends State<HomePage> {
                 0.9,
               ],
               colors: [
-                ReusableMethods.colorGrades,
-                ReusableMethods.colorPeople,
-                ReusableMethods.colorAssignment,
-                ReusableMethods.colorAnnouncement,
+                ReusableWidgets.colorGrades,
+                ReusableWidgets.colorPeople,
+                ReusableWidgets.colorAssignment,
+                ReusableWidgets.colorAnnouncement,
               ],
             ),
           ),
           child: Card(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            color: ReusableMethods.colorLight,
+            color: ReusableWidgets.colorLight,
             elevation: 2.0,
             child: Container(
               margin: const EdgeInsets.all(8.0),
@@ -746,7 +787,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         courseName,
                         style: TextStyle(
-                          color: ReusableMethods.colorDark,
+                          color: ReusableWidgets.colorDark,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -785,7 +826,7 @@ class _HomePageState extends State<HomePage> {
                             icon: Icon(
                               //CupertinoIcons.news_solid,
                               Icons.announcement_rounded,
-                              color: ReusableMethods.colorAnnouncement,
+                              color: ReusableWidgets.colorAnnouncement,
                             ),
                             tooltip: "announcements",
                           ),
@@ -804,9 +845,8 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                             icon: Icon(
-                              //CupertinoIcons.square_list_fill,
                               Icons.assignment_outlined,
-                              color: ReusableMethods.colorAssignment,
+                              color: ReusableWidgets.colorAssignment,
                             ),
                             tooltip: "assignments",
                           ),
@@ -825,7 +865,7 @@ class _HomePageState extends State<HomePage> {
                             },
                             icon: Icon(
                               CupertinoIcons.person_2_fill,
-                              color: ReusableMethods.colorPeople,
+                              color: ReusableWidgets.colorPeople,
                             ),
                             tooltip: "people",
                           ),
@@ -844,7 +884,7 @@ class _HomePageState extends State<HomePage> {
                             },
                             icon: Icon(
                               CupertinoIcons.chart_bar_alt_fill,
-                              color: ReusableMethods.colorGrades,
+                              color: ReusableWidgets.colorGrades,
                             ),
                             tooltip: "grades",
                           ),
@@ -870,21 +910,20 @@ class _HomePageState extends State<HomePage> {
       SpeedDialChild(
           child: Icon(
             Icons.library_add_outlined,
-            color: ReusableMethods.colorDark,
+            color: ReusableWidgets.colorDark,
             size: 30,
           ),
           label: 'Add Course',
-          labelStyle: TextStyle(color: ReusableMethods.colorDark),
-          labelBackgroundColor: ReusableMethods.colorLight,
-          backgroundColor: ReusableMethods.colorLight,
+          labelStyle: TextStyle(color: ReusableWidgets.colorDark),
+          labelBackgroundColor: ReusableWidgets.colorLight,
+          backgroundColor: ReusableWidgets.colorLight,
           onTap: () => showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  backgroundColor: ReusableMethods.colorLight,
+                  backgroundColor: ReusableWidgets.colorLight,
                   shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(20.0))),
+                      borderRadius: BorderRadius.all(Radius.circular(20.0))),
                   content: Stack(
                     children: [
                       SingleChildScrollView(
@@ -897,8 +936,7 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 24.0,
-                                  color:
-                                  ReusableMethods.colorDark,
+                                  color: ReusableWidgets.colorDark,
                                 ),
                               ),
                             ),
@@ -912,18 +950,15 @@ class _HomePageState extends State<HomePage> {
                                     onChanged: (value) {
                                       courseID = value;
                                     },
-                                    keyboardType:
-                                    TextInputType.name,
+                                    keyboardType: TextInputType.name,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide(
                                           width: 5,
-                                          color: ReusableMethods
-                                              .colorDark,
+                                          color: ReusableWidgets.colorDark,
                                         ),
                                         borderRadius:
-                                        BorderRadius.circular(
-                                            20.0),
+                                            BorderRadius.circular(20.0),
                                       ),
                                       labelText: 'Course Code',
                                     ),
@@ -933,19 +968,15 @@ class _HomePageState extends State<HomePage> {
                                     onChanged: (value) {
                                       name = value;
                                     },
-                                    keyboardType:
-                                    TextInputType.name,
+                                    keyboardType: TextInputType.name,
                                     decoration: InputDecoration(
-                                        border:
-                                        OutlineInputBorder(
+                                        border: OutlineInputBorder(
                                           borderSide: BorderSide(
                                             width: 5,
-                                            color: ReusableMethods
-                                                .colorDark,
+                                            color: ReusableWidgets.colorDark,
                                           ),
                                           borderRadius:
-                                          BorderRadius
-                                              .circular(20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         labelText: 'Course Name'),
                                   ),
@@ -954,106 +985,81 @@ class _HomePageState extends State<HomePage> {
                                     onChanged: (value) {
                                       deptName = value;
                                     },
-                                    keyboardType:
-                                    TextInputType.name,
+                                    keyboardType: TextInputType.name,
                                     decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide(
                                           width: 5,
-                                          color: ReusableMethods
-                                              .colorDark,
+                                          color: ReusableWidgets.colorDark,
                                         ),
                                         borderRadius:
-                                        BorderRadius.circular(
-                                            20.0),
+                                            BorderRadius.circular(20.0),
                                       ),
-                                      labelText:
-                                      'Department Name',
+                                      labelText: 'Department Name',
                                     ),
                                   ),
                                   const SizedBox(height: 15.0),
                                   DropdownButtonFormField(
-                                      dropdownColor:
-                                      ReusableMethods
-                                          .colorLight,
-                                      borderRadius:
-                                      BorderRadius.circular(
-                                          20),
+                                      dropdownColor: ReusableWidgets.colorLight,
+                                      borderRadius: BorderRadius.circular(20),
                                       decoration: InputDecoration(
                                           border: OutlineInputBorder(
                                               borderRadius:
-                                              BorderRadius
-                                                  .circular(
-                                                  20),
+                                                  BorderRadius.circular(20),
                                               borderSide: BorderSide(
                                                   width: 1,
-                                                  color: ReusableMethods
+                                                  color: ReusableWidgets
                                                       .colorDark))),
                                       value: semester,
                                       items: semesters
-                                          .map((item) =>
-                                          DropdownMenuItem(
-                                            value: item,
-                                            child: Text(item,
-                                                style: const TextStyle(
-                                                    fontSize:
-                                                    16)),
-                                          ))
+                                          .map((item) => DropdownMenuItem(
+                                                value: item,
+                                                child: Text(item,
+                                                    style: const TextStyle(
+                                                        fontSize: 16)),
+                                              ))
                                           .toList(),
-                                      onChanged: (item) =>
-                                          setState(
-                                                () =>
-                                            semester = item!,
+                                      onChanged: (item) => setState(
+                                            () => semester = item!,
                                           )),
                                   const SizedBox(height: 15.0),
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       const Text(
                                         'Credits:  ',
-                                        style: TextStyle(
-                                            fontSize: 14),
+                                        style: TextStyle(fontSize: 14),
                                       ),
                                       SizedBox(
                                         width: 65,
-                                        child:
-                                        DropdownButtonFormField(
+                                        child: DropdownButtonFormField(
                                             dropdownColor:
-                                            ReusableMethods
-                                                .colorLight,
+                                                ReusableWidgets.colorLight,
                                             borderRadius:
-                                            BorderRadius
-                                                .circular(
-                                                20),
+                                                BorderRadius.circular(20),
                                             decoration: InputDecoration(
                                                 border: OutlineInputBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        20),
+                                                        BorderRadius.circular(
+                                                            20),
                                                     borderSide: BorderSide(
-                                                        width:
-                                                        1,
-                                                        color: ReusableMethods
+                                                        width: 1,
+                                                        color: ReusableWidgets
                                                             .colorDark))),
                                             value: credit,
                                             items: credits
-                                                .map((item) =>
-                                                DropdownMenuItem(
-                                                  value:
-                                                  item,
-                                                  child: Text(
-                                                      '$item',
-                                                      style:
-                                                      const TextStyle(fontSize: 14)),
-                                                ))
+                                                .map((item) => DropdownMenuItem(
+                                                      value: item,
+                                                      child: Text('$item',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                    ))
                                                 .toList(),
-                                            onChanged:
-                                                (item) =>
-                                                setState(
-                                                      () => credit =
-                                                  item!,
+                                            onChanged: (item) => setState(
+                                                  () => credit = item!,
                                                 )),
                                       ),
                                       const SizedBox(
@@ -1061,47 +1067,37 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       const Text(
                                         'Year:  ',
-                                        style: TextStyle(
-                                            fontSize: 14),
+                                        style: TextStyle(fontSize: 14),
                                       ),
                                       SizedBox(
                                         width: 86,
-                                        child:
-                                        DropdownButtonFormField(
+                                        child: DropdownButtonFormField(
                                             dropdownColor:
-                                            ReusableMethods
-                                                .colorLight,
+                                                ReusableWidgets.colorLight,
                                             borderRadius:
-                                            BorderRadius
-                                                .circular(
-                                                20),
+                                                BorderRadius.circular(20),
                                             decoration: InputDecoration(
                                                 border: OutlineInputBorder(
                                                     borderRadius:
-                                                    BorderRadius.circular(
-                                                        20),
+                                                        BorderRadius.circular(
+                                                            20),
                                                     borderSide: BorderSide(
-                                                        width:
-                                                        1,
-                                                        color: ReusableMethods
+                                                        width: 1,
+                                                        color: ReusableWidgets
                                                             .colorDark))),
                                             value: year,
                                             items: years
-                                                .map((item) =>
-                                                DropdownMenuItem(
-                                                  value:
-                                                  item,
-                                                  child: Text(
-                                                      '$item',
-                                                      style:
-                                                      const TextStyle(fontSize: 14)),
-                                                ))
+                                                .map((item) => DropdownMenuItem(
+                                                      value: item,
+                                                      child: Text('$item',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      14)),
+                                                    ))
                                                 .toList(),
-                                            onChanged:
-                                                (item) =>
-                                                setState(
-                                                      () => year =
-                                                  item!,
+                                            onChanged: (item) => setState(
+                                                  () => year = item!,
                                                 )),
                                       ),
                                     ],
@@ -1112,11 +1108,9 @@ class _HomePageState extends State<HomePage> {
                                       if (name != null &&
                                           courseID != null &&
                                           deptName != null &&
-                                          semester !=
-                                              'Select a semester') {
+                                          semester != 'Select a semester') {
                                         int? id =
-                                        await ReusableMethods
-                                            .getUserId();
+                                            await ReusableMethods.getUserId();
                                         await createCourse(
                                             id!,
                                             courseID!,
@@ -1126,112 +1120,65 @@ class _HomePageState extends State<HomePage> {
                                             semester,
                                             year);
                                         setState(() {
-                                          Navigator.of(context)
-                                              .pop();
+                                          Navigator.of(context).pop();
                                         });
-                                        Flushbar(
-                                          message:
-                                          "$courseID created successfully",
-                                          duration:
-                                          const Duration(
-                                              seconds: 3),
-                                          margin: EdgeInsets.only(
-                                              bottom: MediaQuery.of(
-                                                  context)
-                                                  .viewInsets
-                                                  .bottom +
-                                                  20),
-                                        ).show(context);
+                                        ReusableWidgets.flushbar(
+                                            "$courseID created successfully",
+                                            context);
                                       } else if (name != null &&
                                           courseID != null &&
                                           deptName != null &&
-                                          semester ==
-                                              'Select a semester') {
-                                        Flushbar(
-                                          message:
-                                          "Please select a semester.",
-                                          duration:
-                                          const Duration(
-                                              seconds: 3),
-                                          margin: EdgeInsets.only(
-                                              bottom: MediaQuery.of(
-                                                  context)
-                                                  .viewInsets
-                                                  .bottom +
-                                                  20),
-                                        ).show(context);
+                                          semester == 'Select a semester') {
+                                        ReusableWidgets.flushbar(
+                                            "Please select a semester",
+                                            context);
                                       } else {
-                                        Flushbar(
-                                          message:
-                                          "Please fill all necessary fields.",
-                                          duration:
-                                          const Duration(
-                                              seconds: 3),
-                                          margin: EdgeInsets.only(
-                                              bottom: MediaQuery.of(
-                                                  context)
-                                                  .viewInsets
-                                                  .bottom +
-                                                  20),
-                                        ).show(context);
+                                        ReusableWidgets.flushbar(
+                                            "Please fill all necessary fields",
+                                            context);
                                       }
                                     },
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty
-                                          .all<
+                                      shape: MaterialStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
-                                          BorderRadius
-                                              .circular(20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                       ),
                                       backgroundColor:
-                                      MaterialStateProperty
-                                          .all<Color>(Colors
-                                          .transparent),
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.transparent),
                                       // Set overlayColor to Colors.transparent to remove the purple shadow
                                       overlayColor:
-                                      MaterialStateProperty
-                                          .all<Color>(Colors
-                                          .transparent),
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.transparent),
                                       elevation:
-                                      MaterialStateProperty
-                                          .all<double>(0),
+                                          MaterialStateProperty.all<double>(0),
                                     ),
                                     child: Container(
                                       width: double.infinity,
-                                      padding:
-                                      const EdgeInsets.all(
-                                          15),
+                                      padding: const EdgeInsets.all(15),
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            ReusableMethods
-                                                .colorProfile1,
-                                            ReusableMethods
-                                                .colorProfile2,
-                                            ReusableMethods
-                                                .colorProfile3,
+                                            ReusableWidgets.colorProfile1,
+                                            ReusableWidgets.colorProfile2,
+                                            ReusableWidgets.colorProfile3,
                                           ],
-                                          begin: Alignment
-                                              .centerLeft,
-                                          end: Alignment
-                                              .centerRight,
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
                                         ),
                                         borderRadius:
-                                        BorderRadius.circular(
-                                            20.0),
+                                            BorderRadius.circular(20.0),
                                       ),
                                       child: const Align(
-                                        alignment:
-                                        Alignment.center,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           'Create',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontWeight:
-                                            FontWeight.bold,
+                                            fontWeight: FontWeight.bold,
                                             fontSize: 18,
                                           ),
                                         ),
@@ -1248,31 +1195,28 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 );
-              }
-          )
-      ),
+              })),
     );
 
-    if(courses.isNotEmpty){
+    if (courses.isNotEmpty) {
       speedDialChildren.add(
         SpeedDialChild(
             child: Icon(
-              CupertinoIcons.person_add_solid,
-              color: ReusableMethods.colorDark,
+              CupertinoIcons.person_badge_plus_fill,
+              color: ReusableWidgets.colorDark,
               size: 28,
             ),
             label: 'Invite Student',
-            labelStyle: TextStyle(color: ReusableMethods.colorDark),
-            labelBackgroundColor: ReusableMethods.colorLight,
-            backgroundColor: ReusableMethods.colorLight,
+            labelStyle: TextStyle(color: ReusableWidgets.colorDark),
+            labelBackgroundColor: ReusableWidgets.colorLight,
+            backgroundColor: ReusableWidgets.colorLight,
             onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: ReusableMethods.colorLight,
+                    backgroundColor: ReusableWidgets.colorLight,
                     shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(20.0))),
+                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
                     content: Stack(
                       children: [
                         SingleChildScrollView(
@@ -1285,8 +1229,7 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     fontSize: 24.0,
-                                    color:
-                                    ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                 ),
                               ),
@@ -1300,18 +1243,15 @@ class _HomePageState extends State<HomePage> {
                                       onChanged: (value) {
                                         studentMail = value;
                                       },
-                                      keyboardType:
-                                      TextInputType.name,
+                                      keyboardType: TextInputType.name,
                                       decoration: InputDecoration(
                                         border: OutlineInputBorder(
                                           borderSide: BorderSide(
                                             width: 5,
-                                            color: ReusableMethods
-                                                .colorDark,
+                                            color: ReusableWidgets.colorDark,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         labelText: 'Student Mail',
                                       ),
@@ -1319,36 +1259,27 @@ class _HomePageState extends State<HomePage> {
                                     const SizedBox(height: 15.0),
                                     DropdownButtonFormField(
                                         dropdownColor:
-                                        ReusableMethods
-                                            .colorLight,
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            20),
+                                            ReusableWidgets.colorLight,
+                                        borderRadius: BorderRadius.circular(20),
                                         decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                                 borderRadius:
-                                                BorderRadius
-                                                    .circular(
-                                                    20),
+                                                    BorderRadius.circular(20),
                                                 borderSide: BorderSide(
                                                     width: 1,
-                                                    color: ReusableMethods
+                                                    color: ReusableWidgets
                                                         .colorDark))),
                                         value: inviteCourseID,
                                         items: inviteCourses
-                                            .map((item) =>
-                                            DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item,
-                                                  style: const TextStyle(
-                                                      fontSize:
-                                                      16)),
-                                            ))
+                                            .map((item) => DropdownMenuItem(
+                                                  value: item,
+                                                  child: Text(item,
+                                                      style: const TextStyle(
+                                                          fontSize: 16)),
+                                                ))
                                             .toList(),
-                                        onChanged: (item) =>
-                                            setState(
-                                                  () => inviteCourseID =
-                                              item!,
+                                        onChanged: (item) => setState(
+                                              () => inviteCourseID = item!,
                                             )),
                                     const SizedBox(height: 20.0),
                                     ElevatedButton(
@@ -1356,139 +1287,103 @@ class _HomePageState extends State<HomePage> {
                                         if (studentMail != null &&
                                             inviteCourseID !=
                                                 'Select a course') {
-                                          if (ReusableMethods
-                                              .isValidEmail(
+                                          if (ReusableMethods.isValidEmail(
                                               studentMail!)) {
-                                            int? id =
-                                            await ReusableMethods
+                                            int? id = await ReusableMethods
                                                 .getUserId();
-                                            String
-                                            inviteCourseSemester =
-                                            await getInviteCourseSemester(
-                                                inviteCourseID);
+                                            String inviteCourseSemester =
+                                                await getInviteCourseSemester(
+                                                    inviteCourseID);
                                             int inviteCourseYear =
-                                            await getInviteCourseYear(
-                                                inviteCourseID);
-                                            String
-                                            inviteCourseSectionID =
-                                            await getInviteCourseSectionID(
-                                                inviteCourseID);
-                                            await sendInvite(
-                                                id!,
-                                                studentMail!,
+                                                await getInviteCourseYear(
+                                                    inviteCourseID);
+                                            String inviteCourseSectionID =
+                                                await getInviteCourseSectionID(
+                                                    inviteCourseID);
+                                            await getStudentMails(
                                                 inviteCourseID,
                                                 inviteCourseSectionID,
                                                 inviteCourseSemester,
-                                                inviteCourseYear);
-                                            setState(() {
-                                              Navigator.of(context)
-                                                  .pop();
-                                            });
-                                            Flushbar(
-                                              message:
-                                              "Invite sent to $studentMail for $inviteCourseID",
-                                              duration:
-                                              const Duration(
-                                                  seconds: 3),
-                                              margin:
-                                              EdgeInsets.only(
-                                                  bottom: MediaQuery.of(
-                                                      context)
-                                                      .viewInsets
-                                                      .bottom +
-                                                      20),
-                                            ).show(context);
+                                                inviteCourseYear.toString());
+                                            if (studentMails
+                                                .contains(studentMail)) {
+                                              ReusableWidgets.flushbar(
+                                                  "$studentMail is already enrolled in $inviteCourseID",
+                                                  context);
+                                            } else {
+                                              await sendInvite(
+                                                  id!,
+                                                  studentMail!,
+                                                  inviteCourseID,
+                                                  inviteCourseSectionID,
+                                                  inviteCourseSemester,
+                                                  inviteCourseYear);
+                                              setState(() {
+                                                Navigator.of(context).pop();
+                                              });
+                                              ReusableWidgets.flushbar(
+                                                  "Invite sent to $studentMail for $inviteCourseID",
+                                                  context);
+                                            }
                                           } else {
-                                            Flushbar(
-                                              message:
-                                              "Student mail is badly formatted.",
-                                              duration:
-                                              const Duration(
-                                                  seconds: 3),
-                                              margin:
-                                              EdgeInsets.only(
-                                                  bottom: MediaQuery.of(
-                                                      context)
-                                                      .viewInsets
-                                                      .bottom +
-                                                      20),
-                                            ).show(context);
+                                            ReusableWidgets.flushbar(
+                                                "Student mail is badly formatted",
+                                                context);
                                           }
-                                        } else if (studentMail !=
-                                            null &&
+                                        } else if (studentMail != null &&
                                             inviteCourseID ==
                                                 'Select a course') {
-                                          Flushbar(
-                                            message:
-                                            "Please select a course.",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
+                                          ReusableWidgets.flushbar(
+                                              "Please select a course",
+                                              context);
+                                        } else {
+                                          ReusableWidgets.flushbar(
+                                              "Please fill all necessary fields",
+                                              context);
                                         }
                                       },
                                       style: ButtonStyle(
-                                        shape: MaterialStateProperty
-                                            .all<
+                                        shape: MaterialStateProperty.all<
                                             RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
                                             borderRadius:
-                                            BorderRadius
-                                                .circular(20.0),
+                                                BorderRadius.circular(20.0),
                                           ),
                                         ),
                                         backgroundColor:
-                                        MaterialStateProperty
-                                            .all<Color>(Colors
-                                            .transparent),
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
                                         // Set overlayColor to Colors.transparent to remove the purple shadow
                                         overlayColor:
-                                        MaterialStateProperty
-                                            .all<Color>(Colors
-                                            .transparent),
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
                                         elevation:
-                                        MaterialStateProperty
-                                            .all<double>(0),
+                                            MaterialStateProperty.all<double>(
+                                                0),
                                       ),
                                       child: Container(
                                         width: double.infinity,
-                                        padding:
-                                        const EdgeInsets.all(
-                                            15),
+                                        padding: const EdgeInsets.all(15),
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: [
-                                              ReusableMethods
-                                                  .colorProfile1,
-                                              ReusableMethods
-                                                  .colorProfile2,
-                                              ReusableMethods
-                                                  .colorProfile3,
+                                              ReusableWidgets.colorProfile1,
+                                              ReusableWidgets.colorProfile2,
+                                              ReusableWidgets.colorProfile3,
                                             ],
-                                            begin: Alignment
-                                                .centerLeft,
-                                            end: Alignment
-                                                .centerRight,
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         child: const Align(
-                                          alignment:
-                                          Alignment.center,
+                                          alignment: Alignment.center,
                                           child: Text(
                                             'Invite',
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight:
-                                              FontWeight.bold,
+                                              fontWeight: FontWeight.bold,
                                               fontSize: 18,
                                             ),
                                           ),
@@ -1505,29 +1400,226 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   );
-                }
-            )
-        ),
+                })),
+      );
+      speedDialChildren.add(
+        SpeedDialChild(
+            child: Icon(
+              CupertinoIcons.person_badge_minus_fill,
+              color: ReusableWidgets.colorDark,
+              size: 28,
+            ),
+            label: 'Remove Student',
+            labelStyle: TextStyle(color: ReusableWidgets.colorDark),
+            labelBackgroundColor: ReusableWidgets.colorLight,
+            backgroundColor: ReusableWidgets.colorLight,
+            onTap: () => showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    backgroundColor: ReusableWidgets.colorLight,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                    content: Stack(
+                      children: [
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Remove a Student',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 24.0,
+                                    color: ReusableWidgets.colorDark,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20.0,
+                              ),
+                              Form(
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      onChanged: (value) {
+                                        studentMail = value;
+                                      },
+                                      keyboardType: TextInputType.name,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            width: 5,
+                                            color: ReusableWidgets.colorDark,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                        ),
+                                        labelText: 'Student Mail',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15.0),
+                                    DropdownButtonFormField(
+                                        dropdownColor:
+                                            ReusableWidgets.colorLight,
+                                        borderRadius: BorderRadius.circular(20),
+                                        decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                borderSide: BorderSide(
+                                                    width: 1,
+                                                    color: ReusableWidgets
+                                                        .colorDark))),
+                                        value: removeCourseID,
+                                        items: inviteCourses
+                                            .map((item) => DropdownMenuItem(
+                                                  value: item,
+                                                  child: Text(item,
+                                                      style: const TextStyle(
+                                                          fontSize: 16)),
+                                                ))
+                                            .toList(),
+                                        onChanged: (item) => setState(
+                                              () => removeCourseID = item!,
+                                            )),
+                                    const SizedBox(height: 20.0),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        if (studentMail != null &&
+                                            removeCourseID !=
+                                                'Select a course') {
+                                          if (ReusableMethods.isValidEmail(
+                                              studentMail!)) {
+                                            String removeCourseSemester =
+                                                await getInviteCourseSemester(
+                                                    removeCourseID);
+                                            int removeCourseYear =
+                                                await getInviteCourseYear(
+                                                    removeCourseID);
+                                            String removeCourseSectionID =
+                                                await getInviteCourseSectionID(
+                                                    removeCourseID);
+                                            await getStudentMails(
+                                                removeCourseID,
+                                                removeCourseSectionID,
+                                                removeCourseSemester,
+                                                removeCourseYear.toString());
+                                            if (studentMails
+                                                .contains(studentMail)) {
+                                              await removeStudent(
+                                                  studentMail!,
+                                                  removeCourseID,
+                                                  removeCourseSectionID,
+                                                  removeCourseSemester,
+                                                  removeCourseYear);
+                                              setState(() {
+                                                Navigator.of(context).pop();
+                                              });
+                                              ReusableWidgets.flushbar(
+                                                  "$studentMail removed from $removeCourseID",
+                                                  context);
+                                            } else {
+                                              ReusableWidgets.flushbar(
+                                                  "$studentMail cannot be removed since it doesn't exist in $removeCourseID",
+                                                  context);
+                                            }
+                                          } else {
+                                            ReusableWidgets.flushbar(
+                                                "Student mail is badly formatted",
+                                                context);
+                                          }
+                                        } else if (studentMail != null &&
+                                            removeCourseID ==
+                                                'Select a course') {
+                                          ReusableWidgets.flushbar(
+                                              "Please select a course",
+                                              context);
+                                        } else {
+                                          ReusableWidgets.flushbar(
+                                              "Please fill all necessary fields",
+                                              context);
+                                        }
+                                      },
+                                      style: ButtonStyle(
+                                        shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                        ),
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
+                                        // Set overlayColor to Colors.transparent to remove the purple shadow
+                                        overlayColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
+                                        elevation:
+                                            MaterialStateProperty.all<double>(
+                                                0),
+                                      ),
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(15),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              ReusableWidgets.colorProfile1,
+                                              ReusableWidgets.colorProfile2,
+                                              ReusableWidgets.colorProfile3,
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            'Remove',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    //const SizedBox(height: 10.0),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                })),
       );
       speedDialChildren.add(
         SpeedDialChild(
             child: Icon(
               Icons.announcement_rounded,
-              color: ReusableMethods.colorDark,
+              color: ReusableWidgets.colorDark,
               size: 30,
             ),
             label: 'Make Announcement',
-            labelStyle: TextStyle(color: ReusableMethods.colorDark),
-            labelBackgroundColor: ReusableMethods.colorLight,
-            backgroundColor: ReusableMethods.colorLight,
+            labelStyle: TextStyle(color: ReusableWidgets.colorDark),
+            labelBackgroundColor: ReusableWidgets.colorLight,
+            backgroundColor: ReusableWidgets.colorLight,
             onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: ReusableMethods.colorLight,
+                    backgroundColor: ReusableWidgets.colorLight,
                     shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(20.0))),
+                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
                     content: Stack(
                       children: [
                         SingleChildScrollView(
@@ -1540,8 +1632,7 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     fontSize: 24.0,
-                                    color:
-                                    ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                 ),
                               ),
@@ -1553,56 +1644,44 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     DropdownButtonFormField(
                                         dropdownColor:
-                                        ReusableMethods
-                                            .colorLight,
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            20),
+                                            ReusableWidgets.colorLight,
+                                        borderRadius: BorderRadius.circular(20),
                                         decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                                 borderRadius:
-                                                BorderRadius
-                                                    .circular(
-                                                    20),
+                                                    BorderRadius.circular(20),
                                                 borderSide: BorderSide(
                                                     width: 1,
-                                                    color: ReusableMethods
+                                                    color: ReusableWidgets
                                                         .colorDark))),
                                         value: inviteCourseID,
                                         items: inviteCourses
-                                            .map((item) =>
-                                            DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item,
-                                                  style: const TextStyle(
-                                                      fontSize:
-                                                      16)),
-                                            ))
+                                            .map((item) => DropdownMenuItem(
+                                                  value: item,
+                                                  child: Text(item,
+                                                      style: const TextStyle(
+                                                          fontSize: 16)),
+                                                ))
                                             .toList(),
-                                        onChanged: (item) =>
-                                            setState(
-                                                  () => inviteCourseID =
-                                              item!,
+                                        onChanged: (item) => setState(
+                                              () => inviteCourseID = item!,
                                             )),
                                     const SizedBox(height: 20.0),
                                     TextFormField(
                                       onChanged: (value) {
                                         announcementTitle = value;
                                       },
-                                      keyboardType:
-                                      TextInputType.name,
+                                      keyboardType: TextInputType.name,
                                       maxLines: null,
                                       maxLength: 80,
                                       decoration: InputDecoration(
                                         border: OutlineInputBorder(
                                           borderSide: BorderSide(
                                             width: 5,
-                                            color: ReusableMethods
-                                                .colorDark,
+                                            color: ReusableWidgets.colorDark,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         labelText: 'Title',
                                       ),
@@ -1612,8 +1691,7 @@ class _HomePageState extends State<HomePage> {
                                       onChanged: (value) {
                                         announcementContent = value;
                                       },
-                                      keyboardType:
-                                      TextInputType.name,
+                                      keyboardType: TextInputType.name,
                                       minLines: 3,
                                       maxLines: null,
                                       maxLength: 400,
@@ -1621,39 +1699,33 @@ class _HomePageState extends State<HomePage> {
                                         border: OutlineInputBorder(
                                           borderSide: BorderSide(
                                             width: 5,
-                                            color: ReusableMethods
-                                                .colorDark,
+                                            color: ReusableWidgets.colorDark,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         alignLabelWithHint:
-                                        true, // Add this line to align the hint text with the top
+                                            true, // Add this line to align the hint text with the top
                                         labelText:
-                                        'Enter your announcement here',
+                                            'Enter your announcement here',
                                       ),
                                     ),
                                     const SizedBox(height: 20.0),
                                     ElevatedButton(
                                       onPressed: () async {
-                                        if (announcementContent !=
-                                            null &&
-                                            announcementTitle !=
-                                                null &&
+                                        if (announcementContent != null &&
+                                            announcementTitle != null &&
                                             inviteCourseID !=
                                                 'Select a course') {
-                                          String
-                                          inviteCourseSemester =
-                                          await getInviteCourseSemester(
-                                              inviteCourseID);
+                                          String inviteCourseSemester =
+                                              await getInviteCourseSemester(
+                                                  inviteCourseID);
                                           int inviteCourseYear =
-                                          await getInviteCourseYear(
-                                              inviteCourseID);
-                                          String
-                                          inviteCourseSectionID =
-                                          await getInviteCourseSectionID(
-                                              inviteCourseID);
+                                              await getInviteCourseYear(
+                                                  inviteCourseID);
+                                          String inviteCourseSectionID =
+                                              await getInviteCourseSectionID(
+                                                  inviteCourseID);
                                           await publishAnnouncement(
                                             inviteCourseID,
                                             inviteCourseSectionID,
@@ -1661,117 +1733,70 @@ class _HomePageState extends State<HomePage> {
                                             inviteCourseYear,
                                             announcementTitle!,
                                             announcementContent!,
-                                            DateTime.now()
-                                                .toString(),
+                                            DateTime.now().toString(),
                                           );
                                           setState(() {
-                                            Navigator.of(context)
-                                                .pop();
+                                            Navigator.of(context).pop();
                                           });
-                                          Flushbar(
-                                            message:
-                                            "Announcement published in $inviteCourseID",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
+                                          ReusableWidgets.flushbar(
+                                              "Announcement published in $inviteCourseID",
+                                              context);
                                         } else if (announcementContent !=
-                                            null &&
-                                            announcementTitle !=
                                                 null &&
+                                            announcementTitle != null &&
                                             inviteCourseID ==
                                                 'Select a course') {
-                                          Flushbar(
-                                            message:
-                                            "Please select a course.",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
+                                          ReusableWidgets.flushbar(
+                                              "Please select a course",
+                                              context);
                                         } else {
-                                          Flushbar(
-                                            message:
-                                            "Please fill all necessary fields.",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
+                                          ReusableWidgets.flushbar(
+                                              "Please fill all necessary fields",
+                                              context);
                                         }
                                       },
                                       style: ButtonStyle(
-                                        shape: MaterialStateProperty
-                                            .all<
+                                        shape: MaterialStateProperty.all<
                                             RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
                                             borderRadius:
-                                            BorderRadius
-                                                .circular(20.0),
+                                                BorderRadius.circular(20.0),
                                           ),
                                         ),
                                         backgroundColor:
-                                        MaterialStateProperty
-                                            .all<Color>(Colors
-                                            .transparent),
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
                                         // Set overlayColor to Colors.transparent to remove the purple shadow
                                         overlayColor:
-                                        MaterialStateProperty
-                                            .all<Color>(Colors
-                                            .transparent),
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
                                         elevation:
-                                        MaterialStateProperty
-                                            .all<double>(0),
+                                            MaterialStateProperty.all<double>(
+                                                0),
                                       ),
                                       child: Container(
                                         width: double.infinity,
-                                        padding:
-                                        const EdgeInsets.all(
-                                            15),
+                                        padding: const EdgeInsets.all(15),
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: [
-                                              ReusableMethods
-                                                  .colorProfile1,
-                                              ReusableMethods
-                                                  .colorProfile2,
-                                              ReusableMethods
-                                                  .colorProfile3,
+                                              ReusableWidgets.colorProfile1,
+                                              ReusableWidgets.colorProfile2,
+                                              ReusableWidgets.colorProfile3,
                                             ],
-                                            begin: Alignment
-                                                .centerLeft,
-                                            end: Alignment
-                                                .centerRight,
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         child: const Align(
-                                          alignment:
-                                          Alignment.center,
+                                          alignment: Alignment.center,
                                           child: Text(
                                             'Publish',
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight:
-                                              FontWeight.bold,
+                                              fontWeight: FontWeight.bold,
                                               fontSize: 18,
                                             ),
                                           ),
@@ -1788,29 +1813,26 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   );
-                }
-            )
-        ),
+                })),
       );
       speedDialChildren.add(
         SpeedDialChild(
             child: Icon(
               Icons.assignment_outlined,
-              color: ReusableMethods.colorDark,
+              color: ReusableWidgets.colorDark,
               size: 30,
             ),
             label: 'Create Assignment',
-            labelStyle: TextStyle(color: ReusableMethods.colorDark),
-            labelBackgroundColor: ReusableMethods.colorLight,
-            backgroundColor: ReusableMethods.colorLight,
+            labelStyle: TextStyle(color: ReusableWidgets.colorDark),
+            labelBackgroundColor: ReusableWidgets.colorLight,
+            backgroundColor: ReusableWidgets.colorLight,
             onTap: () => showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: ReusableMethods.colorLight,
+                    backgroundColor: ReusableWidgets.colorLight,
                     shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(20.0))),
+                        borderRadius: BorderRadius.all(Radius.circular(20.0))),
                     content: Stack(
                       children: [
                         SingleChildScrollView(
@@ -1823,8 +1845,7 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w800,
                                     fontSize: 24.0,
-                                    color:
-                                    ReusableMethods.colorDark,
+                                    color: ReusableWidgets.colorDark,
                                   ),
                                 ),
                               ),
@@ -1836,56 +1857,44 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     DropdownButtonFormField(
                                         dropdownColor:
-                                        ReusableMethods
-                                            .colorLight,
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            20),
+                                            ReusableWidgets.colorLight,
+                                        borderRadius: BorderRadius.circular(20),
                                         decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                                 borderRadius:
-                                                BorderRadius
-                                                    .circular(
-                                                    20),
+                                                    BorderRadius.circular(20),
                                                 borderSide: BorderSide(
                                                     width: 1,
-                                                    color: ReusableMethods
+                                                    color: ReusableWidgets
                                                         .colorDark))),
                                         value: inviteCourseID,
                                         items: inviteCourses
-                                            .map((item) =>
-                                            DropdownMenuItem(
-                                              value: item,
-                                              child: Text(item,
-                                                  style: const TextStyle(
-                                                      fontSize:
-                                                      16)),
-                                            ))
+                                            .map((item) => DropdownMenuItem(
+                                                  value: item,
+                                                  child: Text(item,
+                                                      style: const TextStyle(
+                                                          fontSize: 16)),
+                                                ))
                                             .toList(),
-                                        onChanged: (item) =>
-                                            setState(
-                                                  () => inviteCourseID =
-                                              item!,
+                                        onChanged: (item) => setState(
+                                              () => inviteCourseID = item!,
                                             )),
                                     const SizedBox(height: 20.0),
                                     TextFormField(
                                       onChanged: (value) {
                                         assignmentTitle = value;
                                       },
-                                      keyboardType:
-                                      TextInputType.name,
+                                      keyboardType: TextInputType.name,
                                       maxLines: null,
                                       maxLength: 80,
                                       decoration: InputDecoration(
                                         border: OutlineInputBorder(
                                           borderSide: BorderSide(
                                             width: 5,
-                                            color: ReusableMethods
-                                                .colorDark,
+                                            color: ReusableWidgets.colorDark,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         labelText: 'Title',
                                       ),
@@ -1895,8 +1904,7 @@ class _HomePageState extends State<HomePage> {
                                       onChanged: (value) {
                                         assignmentContent = value;
                                       },
-                                      keyboardType:
-                                      TextInputType.name,
+                                      keyboardType: TextInputType.name,
                                       minLines: 3,
                                       maxLines: null,
                                       maxLength: 400,
@@ -1904,29 +1912,25 @@ class _HomePageState extends State<HomePage> {
                                         border: OutlineInputBorder(
                                           borderSide: BorderSide(
                                             width: 5,
-                                            color: ReusableMethods
-                                                .colorDark,
+                                            color: ReusableWidgets.colorDark,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         alignLabelWithHint:
-                                        true, // Add this line to align the hint text with the top
-                                        labelText:
-                                        'Enter your assignment here',
+                                            true, // Add this line to align the hint text with the top
+                                        labelText: 'Enter your assignment here',
                                       ),
                                     ),
                                     const SizedBox(height: 15.0),
                                     Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Select a due date',
                                           style: TextStyle(
-                                            color: Colors
-                                                .grey.shade600,
+                                            color: Colors.grey.shade600,
                                             fontSize: 14,
                                           ),
                                           textAlign: TextAlign.left,
@@ -1935,48 +1939,37 @@ class _HomePageState extends State<HomePage> {
                                         SizedBox(
                                           height: 100,
                                           child: Container(
-                                            decoration:
-                                            BoxDecoration(
+                                            decoration: BoxDecoration(
                                               border: Border.all(
                                                 color: Colors.grey,
                                                 width: 1,
                                               ),
                                               borderRadius:
-                                              BorderRadius
-                                                  .circular(
-                                                  20.0),
+                                                  BorderRadius.circular(20.0),
                                             ),
                                             child: CupertinoTheme(
-                                              data:
-                                              CupertinoThemeData(
+                                              data: CupertinoThemeData(
                                                 textTheme:
-                                                CupertinoTextThemeData(
+                                                    CupertinoTextThemeData(
                                                   dateTimePickerTextStyle:
-                                                  TextStyle(
-                                                    color: ReusableMethods
+                                                      TextStyle(
+                                                    color: ReusableWidgets
                                                         .colorDark,
                                                     fontSize: 15,
                                                   ),
                                                 ),
                                               ),
-                                              child:
-                                              CupertinoDatePicker(
-                                                minimumDate: DateTime
-                                                    .now()
-                                                    .subtract(
-                                                    const Duration(
-                                                        minutes:
-                                                        1)),
+                                              child: CupertinoDatePicker(
+                                                minimumDate: DateTime.now()
+                                                    .subtract(const Duration(
+                                                        minutes: 2)),
                                                 use24hFormat: true,
                                                 initialDateTime:
-                                                assignmentDueDate,
-                                                onDateTimeChanged:
-                                                    (value) {
+                                                    assignmentDueDate,
+                                                onDateTimeChanged: (value) {
                                                   setState(() {
-                                                    assignmentDueDate =
-                                                        value;
-                                                    isDateSelected =
-                                                    true;
+                                                    assignmentDueDate = value;
+                                                    isDateSelected = true;
                                                   });
                                                 },
                                               ),
@@ -1988,23 +1981,19 @@ class _HomePageState extends State<HomePage> {
                                     const SizedBox(height: 20.0),
                                     ElevatedButton(
                                       onPressed: () async {
-                                        if (assignmentContent !=
-                                            null &&
-                                            assignmentTitle !=
-                                                null &&
+                                        if (assignmentContent != null &&
+                                            assignmentTitle != null &&
                                             inviteCourseID !=
                                                 'Select a course') {
-                                          String
-                                          inviteCourseSemester =
-                                          await getInviteCourseSemester(
-                                              inviteCourseID);
+                                          String inviteCourseSemester =
+                                              await getInviteCourseSemester(
+                                                  inviteCourseID);
                                           int inviteCourseYear =
-                                          await getInviteCourseYear(
-                                              inviteCourseID);
-                                          String
-                                          inviteCourseSectionID =
-                                          await getInviteCourseSectionID(
-                                              inviteCourseID);
+                                              await getInviteCourseYear(
+                                                  inviteCourseID);
+                                          String inviteCourseSectionID =
+                                              await getInviteCourseSectionID(
+                                                  inviteCourseID);
                                           await publishAssignment(
                                             inviteCourseID,
                                             inviteCourseSectionID,
@@ -2012,126 +2001,76 @@ class _HomePageState extends State<HomePage> {
                                             inviteCourseYear,
                                             assignmentTitle!,
                                             assignmentContent!,
-                                            DateTime.now()
-                                                .toString(),
-                                            assignmentDueDate
-                                                .toString(),
+                                            DateTime.now().toString(),
+                                            assignmentDueDate.toString(),
                                           );
                                           setState(() {
-                                            Navigator.of(context)
-                                                .pop();
+                                            Navigator.of(context).pop();
                                           });
-                                          Flushbar(
-                                            message:
-                                            "Assignment published in $inviteCourseID",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
-                                        } else if (assignmentContent !=
-                                            null &&
-                                            assignmentTitle !=
-                                                null &&
+                                          ReusableWidgets.flushbar(
+                                              "Assignment published in $inviteCourseID",
+                                              context);
+                                        } else if (assignmentContent != null &&
+                                            assignmentTitle != null &&
                                             inviteCourseID ==
                                                 'Select a course') {
-                                          Flushbar(
-                                            message:
-                                            "Please select a course.",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
+                                          ReusableWidgets.flushbar(
+                                              "Please select a course",
+                                              context);
                                         } else {
-                                          Flushbar(
-                                            message:
-                                            "Please fill all necessary fields.",
-                                            duration:
-                                            const Duration(
-                                                seconds: 3),
-                                            margin: EdgeInsets.only(
-                                                bottom: MediaQuery.of(
-                                                    context)
-                                                    .viewInsets
-                                                    .bottom +
-                                                    20),
-                                          ).show(context);
+                                          ReusableWidgets.flushbar(
+                                              "Please fill all necessary fields",
+                                              context);
                                         }
                                       },
                                       style: ButtonStyle(
-                                        shape: MaterialStateProperty
-                                            .all<
+                                        shape: MaterialStateProperty.all<
                                             RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
                                             borderRadius:
-                                            BorderRadius
-                                                .circular(20.0),
+                                                BorderRadius.circular(20.0),
                                           ),
                                         ),
                                         backgroundColor:
-                                        MaterialStateProperty
-                                            .all<Color>(Colors
-                                            .transparent),
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
                                         // Set overlayColor to Colors.transparent to remove the purple shadow
                                         overlayColor:
-                                        MaterialStateProperty
-                                            .all<Color>(Colors
-                                            .transparent),
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
                                         elevation:
-                                        MaterialStateProperty
-                                            .all<double>(0),
+                                            MaterialStateProperty.all<double>(
+                                                0),
                                       ),
                                       child: Container(
                                         width: double.infinity,
-                                        padding:
-                                        const EdgeInsets.all(
-                                            15),
+                                        padding: const EdgeInsets.all(15),
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: [
-                                              ReusableMethods
-                                                  .colorProfile1,
-                                              ReusableMethods
-                                                  .colorProfile2,
-                                              ReusableMethods
-                                                  .colorProfile3,
+                                              ReusableWidgets.colorProfile1,
+                                              ReusableWidgets.colorProfile2,
+                                              ReusableWidgets.colorProfile3,
                                             ],
-                                            begin: Alignment
-                                                .centerLeft,
-                                            end: Alignment
-                                                .centerRight,
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
                                           ),
                                           borderRadius:
-                                          BorderRadius.circular(
-                                              20.0),
+                                              BorderRadius.circular(20.0),
                                         ),
                                         child: const Align(
-                                          alignment:
-                                          Alignment.center,
+                                          alignment: Alignment.center,
                                           child: Text(
                                             'Publish',
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight:
-                                              FontWeight.bold,
+                                              fontWeight: FontWeight.bold,
                                               fontSize: 18,
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                    //const SizedBox(height: 10.0),
                                   ],
                                 ),
                               ),
@@ -2141,12 +2080,9 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   );
-                }
-            )
-        ),
+                })),
       );
       speedDialChildren = speedDialChildren.reversed.toList();
     }
   }
-
 }
