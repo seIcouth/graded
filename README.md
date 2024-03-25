@@ -1,2 +1,5 @@
-# graded
- University Course Management System
+University Course Management System
+
+Contributors:
+- Emre Temiz (seIcouth)
+- Yağız Erdem (yagizerdm)
